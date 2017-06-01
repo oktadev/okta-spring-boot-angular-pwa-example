@@ -8,7 +8,7 @@ declare let OktaAuth: any;
     <md-card *ngIf="givenName">
       <h2>Welcome, {{givenName}}!</h2>
       <button md-raised-button (click)="logout()">Logout</button>
-      <p><a routerLink="/beer-list" routerLinkActive="active">Beer List</a></p>
+      <a md-button routerLink="/beer-list" routerLinkActive="active">Beer List</a>
     </md-card>
 
     <md-card *ngIf="!givenName">

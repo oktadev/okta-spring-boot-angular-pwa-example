@@ -44,6 +44,9 @@ self.addEventListener('activate', (e) => {
 });
 
 self.addEventListener('fetch', (e) => {
+  /*if (e.request.url.indexOf('/revoke') > -1 || e.request.url.indexOf('/me') > -1) {
+    return;
+  }*/
   log('Service Worker: Fetch URL ', e.request.url);
 
   // Match requests for data and handle them separately
