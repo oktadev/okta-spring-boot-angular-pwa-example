@@ -1,10 +1,18 @@
-<h2>Beer List</h2>
+<md-card>
+  <md-card-title>Beer List</md-card-title>
+  <md-card-content>
+    <md-list>
+      <md-list-item *ngFor="let beer of beers">
+        <img md-list-avatar src="{{beer.giphyUrl}}" alt="{{beer.name}}">
+        <h3 md-line>
+          {{beer.name}}
+        </h3>
+      </md-list-item>
+    </md-list>
 
-<md-list>
-  <md-list-item *ngFor="let beer of beers">
-    <img md-list-avatar src="{{beer.giphyUrl}}" alt="{{beer.name}}">
-    <h3 md-line>
-      {{beer.name}}
-    </h3>
-  </md-list-item>
-</md-list>
+    <p><a routerLink="/home" routerLinkActive="active">Home</a></p>
+  </md-card-content>
+</md-card>
+
+
+

@@ -11,11 +11,10 @@ export class BeerService {
   }
 
   getAll(): Observable<any> {
-    const accessToken = this.oauthService.getAccessToken();
     const headers: Headers = new Headers();
-    headers.append('Authorization', 'Bearer ' + accessToken);
+    headers.append('Authorization', this.oauthService.authorizationHeader());
 
-    let options = new RequestOptions({ headers: headers, withCredentials: true });
+    let options = new RequestOptions({ headers: headers });
 
     return this.http.get('http://localhost:8080/good-beers', options)
       .map((response: Response) => response.json());

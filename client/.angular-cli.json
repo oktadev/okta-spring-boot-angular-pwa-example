@@ -23,6 +23,7 @@
         "styles.css"
       ],
       "scripts": [
+        "../node_modules/@okta/okta-auth-js/dist/okta-auth-js.min.js"
       ],
       "environmentSource": "environments/environment.ts",
       "environments": {
