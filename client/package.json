@@ -23,7 +23,6 @@
     "@angular/platform-browser-dynamic": "^4.0.0",
     "@angular/router": "^4.0.0",
     "@okta/okta-auth-js": "^1.8.0",
-    "angular-oauth2-oidc": "^1.0.20",
     "angular-stormpath": "^0.1.6",
     "bootstrap": "^3.3.7",
     "core-js": "^2.4.1",

@@ -9,18 +9,16 @@ import { BeerService } from './shared/beer/beer.service';
 import { GiphyService } from './shared/giphy/giphy.service';
 import { MaterialModule } from '@angular/material';
 import { AppShellModule } from '@angular/app-shell';
-import { OAuthModule } from 'angular-oauth2-oidc';
 import { HomeComponent } from "app/home/home.component";
 import { AuthGuard } from './shared/auth/auth.guard.service';
 import { RouterModule, Routes } from '@angular/router';
 import { StormpathConfiguration, StormpathModule } from 'angular-stormpath';
-import { MainComponent } from './main/main.component';
 
 const appRoutes: Routes = [
   { path: 'beer-list', component: BeerListComponent, canActivate: [AuthGuard] },
-  { path: 'login', component: MainComponent},
-  { path: '', redirectTo: 'login', pathMatch: 'full' },
-  { path: '**', redirectTo: 'login' }
+  { path: 'home', component: HomeComponent },
+  { path: '', redirectTo: 'home', pathMatch: 'full' },
+  { path: '**', redirectTo: 'home' }
 ];
 
 export function stormpathConfig(): StormpathConfiguration {
@@ -34,8 +32,7 @@ export function stormpathConfig(): StormpathConfiguration {
   declarations: [
     AppComponent,
     BeerListComponent,
-    HomeComponent,
-    MainComponent
+    HomeComponent
   ],
   imports: [
     BrowserModule,
@@ -44,7 +41,6 @@ export function stormpathConfig(): StormpathConfiguration {
     MaterialModule,
     AppShellModule.runtime(),
     RouterModule.forRoot(appRoutes),
-    OAuthModule.forRoot(),
     StormpathModule
   ],
   providers: [BeerService, GiphyService, AuthGuard,
