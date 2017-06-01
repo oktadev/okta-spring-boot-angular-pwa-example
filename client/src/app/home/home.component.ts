@@ -4,12 +4,12 @@ import { OAuthService } from 'angular-oauth2-oidc';
 @Component({
   template: `<div *ngIf="givenName">
     <h2>Welcome, {{givenName}}!</h2>
-    <button (click)="logout()">Logout</button>
+    <button md-raised-button (click)="logout()">Logout</button>
     <p><a routerLink="/beer-list" routerLinkActive="active">Beer List</a></p>
   </div>
 
   <div *ngIf="!givenName">
-    <button (click)="login()">Login</button>
+    <button md-raised-button (click)="login()">Login</button>
   </div>`
 })
 export class HomeComponent {
