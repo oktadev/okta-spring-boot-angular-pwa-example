@@ -1,18 +1,18 @@
 import { Injectable } from '@angular/core';
 import { ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot } from '@angular/router';
-import { Stormpath } from 'angular-stormpath';
+import { OAuthService } from 'angular-oauth2-oidc';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
 
-  constructor(private stormpath: Stormpath, private router: Router) {}
+  constructor(private oauthService: OAuthService, private router: Router) {}
 
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean {
-    if (this.stormpath.getToken()) {
+    if (this.oauthService.hasValidIdToken()) {
       return true;
     }
 
-    this.router.navigate(['/login']);
+    this.router.navigate(['/home']);
     return false;
   }
 }

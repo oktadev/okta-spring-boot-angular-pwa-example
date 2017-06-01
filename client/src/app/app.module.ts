@@ -13,29 +13,20 @@ import { OAuthModule } from 'angular-oauth2-oidc';
 import { HomeComponent } from "app/home/home.component";
 import { AuthGuard } from './shared/auth/auth.guard.service';
 import { RouterModule, Routes } from '@angular/router';
-import { StormpathConfiguration, StormpathModule } from 'angular-stormpath';
-import { MainComponent } from './main/main.component';
+import { StormpathModule } from 'angular-stormpath';
 
 const appRoutes: Routes = [
   { path: 'beer-list', component: BeerListComponent, canActivate: [AuthGuard] },
-  { path: 'login', component: MainComponent},
-  { path: '', redirectTo: 'login', pathMatch: 'full' },
-  { path: '**', redirectTo: 'login' }
+  { path: 'home', component: HomeComponent },
+  { path: '', redirectTo: 'home', pathMatch: 'full' },
+  { path: '**', redirectTo: 'home' }
 ];
-
-export function stormpathConfig(): StormpathConfiguration {
-  let spConfig: StormpathConfiguration = new StormpathConfiguration();
-  spConfig.endpointPrefix = 'http://localhost:8080';
-  spConfig.autoAuthorizedUris.push(new RegExp(spConfig.endpointPrefix + '/*'));
-  return spConfig;
-}
 
 @NgModule({
   declarations: [
     AppComponent,
     BeerListComponent,
-    HomeComponent,
-    MainComponent
+    HomeComponent
   ],
   imports: [
     BrowserModule,
@@ -47,11 +38,7 @@ export function stormpathConfig(): StormpathConfiguration {
     OAuthModule.forRoot(),
     StormpathModule
   ],
-  providers: [BeerService, GiphyService, AuthGuard,
-    {
-      provide: StormpathConfiguration, useFactory: stormpathConfig
-    }
-  ],
+  providers: [BeerService, GiphyService, AuthGuard],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
