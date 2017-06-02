@@ -700,53 +700,16 @@ Now it's time for one of the coolest places on the internet - *production!*
 
 Before you deploy these applications to production, I recommend stopping both. That way there's no resource contention for file access. 
 
-To deploy this app to Cloud Foundry, you'll need 1) to update `deploy.sh` in the root directory to set environment variables, and 2) set the URL of the server in a different file. Here's what the diff looks like after these modifications.
+To deploy this app to Cloud Foundry, you'll need 1) to update `deploy.sh` in the root directory to set environment variables, 2) set the URL of the server in a different file, and 3) add `pushstate: enabled` to  `Staticfile`. You can see the [modified deploy.sh on GitHub](https://github.com/oktadeveloper/okta-spring-boot-angular-pwa-example/blob/master/deploy.sh).
 
-```diff
-diff --git a/deploy.sh b/deploy.sh
-index 69271c2..1238b79 100755
---- a/deploy.sh
-+++ b/deploy.sh
-@@ -41,6 +41,9 @@ cf a
- cd $r/server
- mvn clean package
- cf push -p target/*jar pwa-server --no-start  --random-route
-+cf set-env pwa-server STORMPATH_API_KEY_ID $STORMPATH_CLIENT_BASEURL
-+cf set-env pwa-server STORMPATH_API_KEY_ID $OKTA_APPLICATION_ID
-+cf set-env pwa-server STORMPATH_API_KEY_SECRET $OKTA_API_TOKEN
- 
- # Get the URL for the server
- serverUri=https://`app_domain pwa-server`
-@@ -49,7 +52,7 @@ serverUri=https://`app_domain pwa-server`
- cd $r/client
- rm -rf dist
- # replace the server URL in the client
--sed -i -e "s|http://localhost:8080|$serverUri|g" $r/client/src/app/shared/beer/beer.service.ts
-+sed -i -e "s|http://localhost:8080|$serverUri|g" $r/client/src/app/app.module.ts
- yarn && ng build --prod --aot
- # Fix filenames in sw.js
- python $r/sw.py
-@@ -63,7 +66,7 @@ cf start pwa-client
- clientUri=https://`app_domain pwa-client`
- 
- # replace the client URL in the server
--sed -i -e "s|http://localhost:4200|$clientUri|g" $r/server/src/main/java/com/example/beer/BeerController.java
-+sed -i -e "s|http://localhost:4200|$clientUri|g" $r/server/src/main/resources/application.properties
- 
- # redeploy the server
- cd $r/server
-@@ -73,8 +76,8 @@ cf push -p target/*jar pwa-server
- # cleanup changed files
- git checkout $r/client
- git checkout $r/server
--rm $r/client/src/app/shared/beer/beer.service.ts-e
--rm $r/server/src/main/java/com/example/beer/BeerController.java-e
-+rm $r/client/src/app/app.module.ts-e
-+rm $r/server/src/main/resources/application.properties-e
- 
- # show apps and URLs
- cf apps
+// todo: IMO, this note will look better if it has a box around it, like a callout of sorts
+**NOTE:** An alternative to enabling push state is to use hashes in the URL. To do this, you can pass in `{useHash: true}` when creating your routes. 
+          
+```typescript
+RouterModule.forRoot(appRoutes, {useHash: true})
 ```
+
+Unfortunately, this causes the redirect login button to fail since there will be two hashes in the URL.
 
 [Install the Cloud Foundry CLI](https://docs.cloudfoundry.org/cf-cli/install-go-cli.html), then log into [Pivotal Web Services](http://run.pivotal.io/). 
 
@@ -756,36 +719,63 @@ cf login -a api.run.pivotal.io
 
 Run `./deploy.sh` and watch the magic happen!
 
-**NOTE:** The first time I ran this script, I let the client generate a name dynamically. The name chosen had a number of dashes in it and the name was deemed invalid by Okta.
+If you navigate to the client's URL after deploying, you'll see an error like the following in Chrome's console.
+
+```
+XMLHttpRequest cannot load https://dev-158606.oktapreview.com/.well-known/openid-configuration. 
+No 'Access-Control-Allow-Origin' header is present on the requested resource. Origin 
+'https://pwa-client-phototopographical-subcurrent.cfapps.io' is therefore not allowed access.
+```
+
+To fix this, modify the Trusted Origins on Okta (under **Security** > **API**) to have your client's URL (e.g. `https://pwa-client-phototopographical-subcurrent.cfapps.io`). 
+
+![Add Trusted Origin](static/add-cf-origin.png)
+
+This makes the cross-origin error go away, but it will cause an invalid redirect issue when you try to login with the first login button. 
 
 ![Invalid Redirect URI](static/invalid-redirect.png)
 
-I tried adding it to my OIDC settings, but that didn't help anything. I modified `deploy.sh` to have a name of pwa-client-auth and tried again. This time it failed because of an cross-origin error. I modified my Trusted Origins on Okta (under **Security** > **API**) to use `https://pwa-client-auth.cfapps.io`. 
+To fix this, modify the `Redirect URIs` for your OIDC application in Okta. 
 
-![Add Origin](static/add-origin.png)
+![OIDC Redirect URIs](static/oidc-settings-cf-redirect.png)
 
-Next, I received an invalid redirect message again. I modified my OIDC app settings and this time it worked!
+Now both login techniques should work as expected and you should be able to load the beer list from your Spring Boot app.
 
-I also found that reloading the app on Cloud Foundry didn't work, it'd just result in a 404 for the `/home` URL. You can pass in `{useHash: true}` when creating your routes to workaround this issue. *[Thanks Stack Overflow](https://stackoverflow.com/a/38964658/65681)!*
+![Production Beer List](static/production-beer-list.png)
 
-```typescript
-RouterModule.forRoot(appRoutes, {useHash: true}),
+The first time I ran [Lighthouse](https://developers.google.com/web/tools/lighthouse/) on this application, I was surprised to see it received a PWA score of 91. When I deployed this application previously, it [received a 98](https://developer.okta.com/blog/2017/05/09/progressive-web-applications-with-angular-and-spring-boot#cloud-foundry).
+ 
+![Lighthouse Score, first attempt](static/lighthouse-without-512.png)
+
+I followed the advice in the report and added the following in the list of `icons` in  `client/src/assets/icons/manifest.json`.
+
+```json
+{
+  "src": "/assets/icons/android-chrome-512x512.png",
+  "sizes": "512x512",
+  "type": "image/png"
+}
 ```
+
+When I re-deployed with this change, I received a 100. *Huzzah!*
+
+![Lighthouse Perfect Score](static/lighthouse-with-512.png)
 
 ## Happy Authenticating!
 
+You can find the source code associated with this article [on GitHub](https://github.com/oktadeveloper/okta-spring-boot-angular-pwa-example). If you find any bugs, please file an issue, or leave a comment on this post. Of course, you can always [ping me on Twitter](https://twitter.com/mraible) too.
 
-## Source Code
-You can find the source code associated with this article [on GitHub](https://github.com/stormpath/stormpath-spring-boot-angular-pwa-example). If you find any bugs, please file an issue, or leave a comment on this post. Of course, you can always [ping me on Twitter](https://twitter.com/mraible) too.
+This article showed you how to develop a Spring Boot backend, and lock it down with Okta. You learned how to develop an Angular front end and use OpenID Connect to get an access token and securely communicate with the backend. You also learned how you can use the Stormpath Angular SDK to do the same thing. Finally, you saw how to deploy everything to Cloud Foundry and get a Lighthouse PWA score of 100.
 
-## What’s Next?
+To learn more about PWAs, check out some recent tutorials I wrote.
 
-This article showed you how to develop a Spring Boot backend, and lock it down with Stormpath. You learned how to develop an Angular front end and use Stormpath’s Angular SDK to communicate with the secure backend. In a future article, I’ll show you <a href="https://stormpath.com/blog/progressive-web-applications-angular-spring-boot-stormpath">how to create a progressive web application and deploy it to the cloud</a>. 
+* [Build Your First Progressive Web Application with Angular and Spring Boot](http://developer.okta.com/blog/2017/05/09/progressive-web-applications-with-angular-and-spring-boot) 
+* [Tutorial: Develop a Mobile App With Ionic and Spring Boot](http://developer.okta.com/blog/2017/05/17/develop-a-mobile-app-with-ionic-and-spring-boot)
 
-To learn more about Angular, our Java SDK, or Stormpath, check out the following resources:
+There's also a number of excellent resources by Google, Pluralsight, and Smashing Magazine.
 
-* [A Simple Web App with Spring Boot, Spring Security and Stormpath – in 15 Minutes](https://stormpath.com/blog/build-spring-boot-spring-security-app)
-* [The Architecture of Stormpath’s Java SDK](https://stormpath.com/blog/java-sdk-architecture)
-* [Tutorial: Establish Trust Between Microservices with JWT and Spring Boot](https://stormpath.com/blog/microservices-jwt-spring-boot)
-* [Getting Started with Angular](https://www.youtube.com/watch?v=Jq3szz2KOOs) A Stormpath webinar 
-* [Stormpath Client API Guide](https://docs.stormpath.com/client-api/product-guide/latest/) 
+* Addy Osmani at Google I/O '17: [Production Progressive Web Apps With JavaScript Frameworks](https://youtu.be/aCMbSyngXB4)
+* Google's [Progressive Web Apps](https://developers.google.com/web/progressive-web-apps/) homepage, [step-by-step code lab](https://codelabs.developers.google.com/codelabs/your-first-pwapp/), and [instructor-led PWA training](https://developers.google.com/web/ilt/pwa/).
+* Pluralsight's [Getting Started with Progressive Web Apps](https://www.pluralsight.com/courses/web-apps-progressive-getting-started)
+* [A Beginner's Guide To Progressive Web Apps](https://www.smashingmagazine.com/2016/08/a-beginners-guide-to-progressive-web-apps/)
+ 
