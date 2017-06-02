@@ -262,6 +262,14 @@ import { OAuthService } from 'angular-oauth2-oidc';
 ...
 ```
 
+Modify `src/app/app/app.component.html` to use `<router-outlet>` instead of `<app-beer-list>`.
+
+```html
+<div *shellNoRender>
+  <router-outlet></router-outlet>
+</div>
+```
+
 Create `src/app/home/home.component.ts` and configure it to have **Login** and **Logout** buttons.
 
 {% raw %}
@@ -582,71 +590,103 @@ import { StormpathConfiguration, StormpathModule } from 'angular-stormpath';
 export function stormpathConfig(): StormpathConfiguration {
   let spConfig: StormpathConfiguration = new StormpathConfiguration();
   spConfig.endpointPrefix = 'http://localhost:8080';
+  spConfig.autoAuthorizedUris.push(new RegExp(spConfig.endpointPrefix + '/*'));
   return spConfig;
 }
 ```
 
 Add `StormpathModule` to the imports in `@NgModule` and use the `stormpathConfig` function to override the default `StormpathConfiguration` in the `providers` list.
 
-<pre class="lang:typescript toolbar:always nums:true nums-toggle:true mark:5,8" title="src/app/app.module.ts">
+```
 @NgModule({
   …
   imports: [
     ...
     StormpathModule
   ],
-  providers: [{
-    provide: StormpathConfiguration, useFactory: stormpathConfig
-  }],
+  providers: [BeerService, GiphyService, AuthGuard,
+    {
+      provide: StormpathConfiguration, useFactory: stormpathConfig
+    }
+  ],
   bootstrap: [AppComponent]
 })
-</pre>
+```
 
-Modify `app.component.html` to add the Stormpath `<sp-authport></sp-authport>` component and a section to show the user’s name and a logout link.
+Modify `home.component.ts` to add the `<sp-authport></sp-authport>` component and a section to show the user’s name and a logout link.
 
-<pre class="lang:html toolbar:always nums:true nums-toggle:true" title="src/app/app.component.html">
-<sp-authport></sp-authport>
-
-<div *ngIf="(user$ | async)" class="row text-center">
-  <h2>
-    Welcome, {{ ( user$ | async ).givenName }}!
-  </h2>
-  <ul class="nav nav-pills nav-stacked text-centered">
-    <li role="presentation" (click)="logout(); false"><a href="">Logout</a></li>
-  </ul>
-</div>
-<div [hidden]="!(user$ | async)">
-  <!-- secure main component or <router-outlet></router-outlet> -->
-</div>
-</pre>
-
-You’ll notice the `user$` variable in the HTML. In order to resolve this, you need to change your `AppComponent` so it extends `AuthPortComponent`.
-
-<pre class="lang:ts toolbar:always nums:true nums-toggle:true" title="src/app/app.component.ts">
+```typescript
+import { Component } from '@angular/core';
 import { AuthPortComponent } from 'angular-stormpath';
-...
-export class AppComponent extends AuthPortComponent {
-</pre>
 
-You can also inject the `Stormpath` service into your component, subscribe to `stormpath.user$` and implement `logout()` yourself.
+@Component({
+  styles: ['sp-authport { margin-top: 20px; display: block; }'],
+  template: `
+    <md-card *ngIf="(user$ | async)">
+      <md-card-title>Welcome, {{ ( user$ | async ).fullName }}!</md-card-title>
+      <md-card-content>
+        <button md-raised-button (click)="logout(); return">Logout</button>
+        <a md-button routerLink="/beer-list">Beer List</a>
+      </md-card-content>
+    </md-card>
 
-<pre class="lang:ts toolbar:always nums:true nums-toggle:true" title="src/app/app.component.ts">
-import { Account, Stormpath } from 'angular-stormpath';
-...
-export class AppComponent {
-  user$: Observable<Account | boolean>;
+    <sp-authport></sp-authport>`
+})
+export class HomeComponent extends AuthPortComponent {
+}
+```
 
-  constructor(private stormpath: Stormpath) {
-    this.user$ = this.stormpath.user$;
-  }
+You’ll notice the `user$` variable in the HTML. This comes from `AuthPortComponent`, which `HomeComponent` extends.
 
-  logout(): void {
-    this.stormpath.logout();
+You'll need to make two more changes to `AuthGuard` and `BeerService`. In `src/app/shared/auth/auth.guard.service.ts`, replace `OAuthService` with `Stormpath`.
+
+```typescript
+import { Injectable } from '@angular/core';
+import { ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot } from '@angular/router';
+import { Stormpath } from 'angular-stormpath';
+
+@Injectable()
+export class AuthGuard implements CanActivate {
+
+  constructor(private stormpath: Stormpath, private router: Router) {}
+
+  canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean {
+    if (this.stormpath.getToken()) {
+      return true;
+    }
+
+    this.router.navigate(['/home']);
+    return false;
   }
 }
-</pre>
+```
 
-Make sure your server is started (with `mvn spring-boot:run` in the server directory, and `ng serve` in the client directory) and navigate to http://localhost:4200. 
+The Angular SDK will automatically send `Authorization` headers to `http://localhost:8080/*` based on the `autoAuthorizedUris` setting in `app.module.ts`. However, you can modify `beer.service.ts` so this URL isn't duplicated.
+
+```typescript
+import { Injectable } from '@angular/core';
+import { Http, Response, Headers, RequestOptions } from '@angular/http';
+import 'rxjs/add/operator/map';
+import { Observable } from 'rxjs';
+import { OAuthService } from 'angular-oauth2-oidc';
+import { StormpathConfiguration } from 'angular-stormpath';
+
+@Injectable()
+export class BeerService {
+
+  constructor(private http: Http, private config: StormpathConfiguration) {
+  }
+
+  getAll(): Observable<any> {
+    return this.http.get(this.config.endpointPrefix + '/good-beers')
+      .map((response: Response) => response.json());
+  }
+}
+```
+
+Make sure your server is started (with `mvn spring-boot:run` in the server directory, and `ng serve` in the client directory) and navigate to http://localhost:4200. You should see a login screen like the one below and see the same post-login screen as you did with OIDC.
+
+
 
 ## Deploy to Cloud Foundry
 
