@@ -8,7 +8,7 @@ declare let OktaAuth: any;
     <md-card *ngIf="givenName">
       <h2>Welcome, {{givenName}}!</h2>
       <button md-raised-button (click)="logout()">Logout</button>
-      <a md-button routerLink="/beer-list" routerLinkActive="active">Beer List</a>
+      <a md-button routerLink="/beer-list">Beer List</a>
     </md-card>
 
     <md-card *ngIf="!givenName">
@@ -55,8 +55,6 @@ export class HomeComponent {
   }
 
   loginWithPassword() {
-    console.log('issuer', this.oauthService.issuer);
-    console.log('clientId', this.oauthService.clientId);
     this.oauthService.createAndSaveNonce().then(nonce => {
       const authClient = new OktaAuth({
         url: this.oauthService.issuer
@@ -65,7 +63,6 @@ export class HomeComponent {
         username: this.username,
         password: this.password
       }).then((response) => {
-        console.log('response', response);
         if (response.status === 'SUCCESS') {
           authClient.token.getWithoutPrompt({
             clientId: this.oauthService.clientId,
