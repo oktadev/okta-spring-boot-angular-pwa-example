@@ -59,6 +59,7 @@ yarn && ng build --prod --aot
 python $r/sw.py
 cd dist
 touch Staticfile
+echo 'pushstate: enabled' > Staticfile
 cf push pwa-client --no-start --random-route
 cf set-env pwa-client FORCE_HTTPS true
 cf start pwa-client
