@@ -33,7 +33,7 @@ const appRoutes: Routes = [
     HttpModule,
     MaterialModule,
     AppShellModule.runtime(),
-    RouterModule.forRoot(appRoutes),
+    RouterModule.forRoot(appRoutes, {useHash: true}),
     OAuthModule.forRoot(),
   ],
   providers: [BeerService, GiphyService, AuthGuard],

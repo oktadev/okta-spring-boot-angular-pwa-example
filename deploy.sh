@@ -41,9 +41,10 @@ cf a
 cd $r/server
 mvn clean package
 cf push -p target/*jar pwa-server --no-start  --random-route
-cf set-env pwa-server STORMPATH_API_KEY_ID $STORMPATH_CLIENT_BASEURL
-cf set-env pwa-server STORMPATH_API_KEY_ID $OKTA_APPLICATION_ID
-cf set-env pwa-server STORMPATH_API_KEY_SECRET $OKTA_API_TOKEN
+cf set-env pwa-server FORCE_HTTPS true
+cf set-env pwa-server STORMPATH_CLIENT_BASEURL $STORMPATH_CLIENT_BASEURL
+cf set-env pwa-server OKTA_APPLICATION_ID $OKTA_APPLICATION_ID
+cf set-env pwa-server OKTA_API_TOKEN $OKTA_API_TOKEN
 
 # Get the URL for the server
 serverUri=https://`app_domain pwa-server`
@@ -58,12 +59,12 @@ yarn && ng build --prod --aot
 python $r/sw.py
 cd dist
 touch Staticfile
-cf push pwa-client --no-start --random-route
-cf set-env pwa-client FORCE_HTTPS true
-cf start pwa-client
+cf push pwaclient --no-start
+cf set-env pwaclient FORCE_HTTPS true
+cf start pwaclient
 
 # Get the URL for the client
-clientUri=https://`app_domain pwa-client`
+clientUri=https://`app_domain pwaclient`
 
 # replace the client URL in the server
 sed -i -e "s|http://localhost:4200|$clientUri|g" $r/server/src/main/resources/application.properties

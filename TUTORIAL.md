@@ -756,7 +756,21 @@ cf login -a api.run.pivotal.io
 
 Run `./deploy.sh` and watch the magic happen!
 
-AF
+**NOTE:** The first time I ran this script, I let the client generate a name dynamically. The name chosen had a number of dashes in it and the name was deemed invalid by Okta.
+
+![Invalid Redirect URI](static/invalid-redirect.png)
+
+I tried adding it to my OIDC settings, but that didn't help anything. I modified `deploy.sh` to have a name of pwa-client-auth and tried again. This time it failed because of an cross-origin error. I modified my Trusted Origins on Okta (under **Security** > **API**) to use `https://pwa-client-auth.cfapps.io`. 
+
+![Add Origin](static/add-origin.png)
+
+Next, I received an invalid redirect message again. I modified my OIDC app settings and this time it worked!
+
+I also found that reloading the app on Cloud Foundry didn't work, it'd just result in a 404 for the `/home` URL. You can pass in `{useHash: true}` when creating your routes to workaround this issue. *[Thanks Stack Overflow](https://stackoverflow.com/a/38964658/65681)!*
+
+```typescript
+RouterModule.forRoot(appRoutes, {useHash: true}),
+```
 
 ## Happy Authenticating!
 
