@@ -53,18 +53,18 @@ serverUri=https://`app_domain pwa-server`
 cd $r/client
 rm -rf dist
 # replace the server URL in the client
-sed -i -e "s|http://localhost:8080|$serverUri|g" $r/client/src/app/app.module.ts
+sed -i -e "s|http://localhost:8080|$serverUri|g" $r/client/src/app/shared/beer/beer.service.ts
 yarn && ng build --prod --aot
 # Fix filenames in sw.js
 python $r/sw.py
 cd dist
 touch Staticfile
-cf push pwaclient --no-start
-cf set-env pwaclient FORCE_HTTPS true
-cf start pwaclient
+cf push pwa-client --no-start --random-route
+cf set-env pwa-client FORCE_HTTPS true
+cf start pwa-client
 
 # Get the URL for the client
-clientUri=https://`app_domain pwaclient`
+clientUri=https://`app_domain pwa-client`
 
 # replace the client URL in the server
 sed -i -e "s|http://localhost:4200|$clientUri|g" $r/server/src/main/resources/application.properties
@@ -77,7 +77,7 @@ cf push -p target/*jar pwa-server
 # cleanup changed files
 git checkout $r/client
 git checkout $r/server
-rm $r/client/src/app/app.module.ts-e
+rm $r/client/src/app/shared/beer/beer.service.ts-e
 rm $r/server/src/main/resources/application.properties-e
 
 # show apps and URLs
