@@ -665,10 +665,9 @@ The Angular SDK will automatically send `Authorization` headers to `http://local
 
 ```typescript
 import { Injectable } from '@angular/core';
-import { Http, Response, Headers, RequestOptions } from '@angular/http';
+import { Http, Response } from '@angular/http';
 import 'rxjs/add/operator/map';
 import { Observable } from 'rxjs';
-import { OAuthService } from 'angular-oauth2-oidc';
 import { StormpathConfiguration } from 'angular-stormpath';
 
 @Injectable()
@@ -686,8 +685,93 @@ export class BeerService {
 
 Make sure your server is started (with `mvn spring-boot:run` in the server directory, and `ng serve` in the client directory) and navigate to http://localhost:4200. You should see a login screen like the one below and see the same post-login screen as you did with OIDC.
 
+**NOTE:** If you still see the OIDC login screen, it's because PWAs often get "stuck" in your browser. In Chrome Developer Tools, navigate to the **Application** tab > **Clear storage** and click the **Clear selected** button at the bottom. You can also open an incognito window.
 
+![Stormpath Angular SDK Login](static/angular-sp-login.png)
+
+There are a couple of issues I found when writing this tutorial. Please subscribe to the following GitHub issues to be notified when they're fixed.
+
+* [Registering a new user doesn't work with Angular](https://github.com/stormpath/stormpath-sdk-java/issues/1335)
+* [OAuth invalid credentials results in "Invalid grant" as error](https://github.com/stormpath/stormpath-sdk-java/issues/1336)
 
 ## Deploy to Cloud Foundry
 
+Now it's time for one of the coolest places on the internet - *production!*
+
+Before you deploy these applications to production, I recommend stopping both. That way there's no resource contention for file access. 
+
+To deploy this app to Cloud Foundry, you'll need 1) to update `deploy.sh` in the root directory to set environment variables, and 2) set the URL of the server in a different file. Here's what the diff looks like after these modifications.
+
+```diff
+diff --git a/deploy.sh b/deploy.sh
+index 69271c2..1238b79 100755
+--- a/deploy.sh
++++ b/deploy.sh
+@@ -41,6 +41,9 @@ cf a
+ cd $r/server
+ mvn clean package
+ cf push -p target/*jar pwa-server --no-start  --random-route
++cf set-env pwa-server STORMPATH_API_KEY_ID $STORMPATH_CLIENT_BASEURL
++cf set-env pwa-server STORMPATH_API_KEY_ID $OKTA_APPLICATION_ID
++cf set-env pwa-server STORMPATH_API_KEY_SECRET $OKTA_API_TOKEN
+ 
+ # Get the URL for the server
+ serverUri=https://`app_domain pwa-server`
+@@ -49,7 +52,7 @@ serverUri=https://`app_domain pwa-server`
+ cd $r/client
+ rm -rf dist
+ # replace the server URL in the client
+-sed -i -e "s|http://localhost:8080|$serverUri|g" $r/client/src/app/shared/beer/beer.service.ts
++sed -i -e "s|http://localhost:8080|$serverUri|g" $r/client/src/app/app.module.ts
+ yarn && ng build --prod --aot
+ # Fix filenames in sw.js
+ python $r/sw.py
+@@ -63,7 +66,7 @@ cf start pwa-client
+ clientUri=https://`app_domain pwa-client`
+ 
+ # replace the client URL in the server
+-sed -i -e "s|http://localhost:4200|$clientUri|g" $r/server/src/main/java/com/example/beer/BeerController.java
++sed -i -e "s|http://localhost:4200|$clientUri|g" $r/server/src/main/resources/application.properties
+ 
+ # redeploy the server
+ cd $r/server
+@@ -73,8 +76,8 @@ cf push -p target/*jar pwa-server
+ # cleanup changed files
+ git checkout $r/client
+ git checkout $r/server
+-rm $r/client/src/app/shared/beer/beer.service.ts-e
+-rm $r/server/src/main/java/com/example/beer/BeerController.java-e
++rm $r/client/src/app/app.module.ts-e
++rm $r/server/src/main/resources/application.properties-e
+ 
+ # show apps and URLs
+ cf apps
+```
+
+[Install the Cloud Foundry CLI](https://docs.cloudfoundry.org/cf-cli/install-go-cli.html), then log into [Pivotal Web Services](http://run.pivotal.io/). 
+
+```
+cf login -a api.run.pivotal.io
+```
+
+Run `./deploy.sh` and watch the magic happen!
+
+AF
+
 ## Happy Authenticating!
+
+
+## Source Code
+You can find the source code associated with this article [on GitHub](https://github.com/stormpath/stormpath-spring-boot-angular-pwa-example). If you find any bugs, please file an issue, or leave a comment on this post. Of course, you can always [ping me on Twitter](https://twitter.com/mraible) too.
+
+## What’s Next?
+
+This article showed you how to develop a Spring Boot backend, and lock it down with Stormpath. You learned how to develop an Angular front end and use Stormpath’s Angular SDK to communicate with the secure backend. In a future article, I’ll show you <a href="https://stormpath.com/blog/progressive-web-applications-angular-spring-boot-stormpath">how to create a progressive web application and deploy it to the cloud</a>. 
+
+To learn more about Angular, our Java SDK, or Stormpath, check out the following resources:
+
+* [A Simple Web App with Spring Boot, Spring Security and Stormpath – in 15 Minutes](https://stormpath.com/blog/build-spring-boot-spring-security-app)
+* [The Architecture of Stormpath’s Java SDK](https://stormpath.com/blog/java-sdk-architecture)
+* [Tutorial: Establish Trust Between Microservices with JWT and Spring Boot](https://stormpath.com/blog/microservices-jwt-spring-boot)
+* [Getting Started with Angular](https://www.youtube.com/watch?v=Jq3szz2KOOs) A Stormpath webinar 
+* [Stormpath Client API Guide](https://docs.stormpath.com/client-api/product-guide/latest/) 

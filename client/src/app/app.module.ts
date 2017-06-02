@@ -13,7 +13,6 @@ import { OAuthModule } from 'angular-oauth2-oidc';
 import { HomeComponent } from './home/home.component';
 import { AuthGuard } from './shared/auth/auth.guard.service';
 import { RouterModule, Routes } from '@angular/router';
-import { StormpathModule } from 'angular-stormpath';
 
 const appRoutes: Routes = [
   { path: 'beer-list', component: BeerListComponent, canActivate: [AuthGuard] },
@@ -36,7 +35,6 @@ const appRoutes: Routes = [
     AppShellModule.runtime(),
     RouterModule.forRoot(appRoutes),
     OAuthModule.forRoot(),
-    StormpathModule
   ],
   providers: [BeerService, GiphyService, AuthGuard],
   bootstrap: [AppComponent]

@@ -41,6 +41,9 @@ cf a
 cd $r/server
 mvn clean package
 cf push -p target/*jar pwa-server --no-start  --random-route
+cf set-env pwa-server STORMPATH_API_KEY_ID $STORMPATH_CLIENT_BASEURL
+cf set-env pwa-server STORMPATH_API_KEY_ID $OKTA_APPLICATION_ID
+cf set-env pwa-server STORMPATH_API_KEY_SECRET $OKTA_API_TOKEN
 
 # Get the URL for the server
 serverUri=https://`app_domain pwa-server`
@@ -49,7 +52,7 @@ serverUri=https://`app_domain pwa-server`
 cd $r/client
 rm -rf dist
 # replace the server URL in the client
-sed -i -e "s|http://localhost:8080|$serverUri|g" $r/client/src/app/shared/beer/beer.service.ts
+sed -i -e "s|http://localhost:8080|$serverUri|g" $r/client/src/app/app.module.ts
 yarn && ng build --prod --aot
 # Fix filenames in sw.js
 python $r/sw.py
@@ -63,7 +66,7 @@ cf start pwa-client
 clientUri=https://`app_domain pwa-client`
 
 # replace the client URL in the server
-sed -i -e "s|http://localhost:4200|$clientUri|g" $r/server/src/main/java/com/example/beer/BeerController.java
+sed -i -e "s|http://localhost:4200|$clientUri|g" $r/server/src/main/resources/application.properties
 
 # redeploy the server
 cd $r/server
@@ -73,8 +76,8 @@ cf push -p target/*jar pwa-server
 # cleanup changed files
 git checkout $r/client
 git checkout $r/server
-rm $r/client/src/app/shared/beer/beer.service.ts-e
-rm $r/server/src/main/java/com/example/beer/BeerController.java-e
+rm $r/client/src/app/app.module.ts-e
+rm $r/server/src/main/resources/application.properties-e
 
 # show apps and URLs
 cf apps
