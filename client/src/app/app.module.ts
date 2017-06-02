@@ -9,7 +9,7 @@ import { BeerService } from './shared/beer/beer.service';
 import { GiphyService } from './shared/giphy/giphy.service';
 import { MaterialModule } from '@angular/material';
 import { AppShellModule } from '@angular/app-shell';
-import { HomeComponent } from "app/home/home.component";
+import { HomeComponent } from './home/home.component';
 import { AuthGuard } from './shared/auth/auth.guard.service';
 import { RouterModule, Routes } from '@angular/router';
 import { StormpathConfiguration, StormpathModule } from 'angular-stormpath';
