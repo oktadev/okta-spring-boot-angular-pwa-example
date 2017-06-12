@@ -2,7 +2,7 @@
 
 You're developing a Progressive Web Application (PWA) and your service worker and web app manifest are working swimmingly. You've even taken the time to deploy it to a server with HTTPS and you're feeling pretty good about  things. But wait, you don't have any way of knowing who your users are! Don't you want to provide them with an opportunity to authenticate and tell you who they are? Once you know who they are, you can give them all kinds of personalization options and inspire them to ❤️ your app!
 
-In this article, I'll show you how you can lock down a Spring Boot app, then use modern authentication protocols like Open ID Connect (OIDC) to authenticate and gain access to its APIs. 
+In this article, I'll show you how you can lock down a Spring Boot app, then use modern authentication protocols like OpenID Connect (OIDC) to authenticate and gain access to its APIs. 
 
 ## Secure Your Spring Boot App
 
@@ -60,7 +60,7 @@ To begin, you'll need to create an Okta Developer account. This account is free 
 
 1. Head on over to <https://www.okta.com/developer/signup>
 2. Fill out the signup form, and click the "Get Started" button
-3. Within a few minutes you will get a conformation email
+3. Within a few minutes you will get a confirmation email
 4. Follow the instructions in the email to finish setting up your account
 
 When setting up a developer account, you end up with a couple URLs.
@@ -98,9 +98,8 @@ Your application has been created, but you still have a few settings to change. 
 1. Check the *Refresh Token*, and *Resource Owner Password* checkboxes and click the **Save** button
 2. Click the **Edit** button on the Client Credentials panel
 3. Select the *Use Client Authentication* radio button, and click the **Save** button
-4. Click on the *Groups* tab
-5. Select the *Assign* button in the *Everyone* column, and click the **Done** button
-6. Grab the ID portion of the URL of your browsers current page, for example: if my URL was: `https://dev-123456-admin.oktapreview.com/admin/app/oidc_client/instance/00icu81200icu812/#tab-groups` then `00icu81200icu812` is your application's ID
+4. Click on the *Assignments* tab and then select the *Assign* button and **Assign to Groups**5. Select the *Assign* button in the *Everyone* column, and click the **Done** button
+6. Grab the ID portion of the URL of your browsers current page, for example: if my URL was: `https://dev-123456-admin.oktapreview.com/admin/app/oidc_client/instance/00icu81200icu812/#tab-assignments` then `00icu81200icu812` is your application's ID
 
 **Important:** You will need to remember your application's ID.
 
@@ -114,16 +113,6 @@ Your application has been created, but you still have a few settings to change. 
 **Important:** You will need to remember this token value, so copy/paste it somewhere safe.
 
 For more information take a look at the official [Create an API token](http://developer.okta.com/docs/api/getting_started/getting_a_token.html) guide.
-
-To make your Spring Boot app aware of your Okta settings, you need to set a few environment variables. You can also use [other options](https://docs.stormpath.com/java/servlet-plugin/config.html) for setting these variables.
-
-```bash
-export STORMPATH_CLIENT_BASEURL=[baseurl_from_above]
-export OKTA_APPLICATION_ID=[application_id_from_above]
-export OKTA_API_TOKEN=[api_token_from_above]
-```
-
-Now, start it up...
 
 ### Run the Spring Boot App
 
@@ -187,21 +176,19 @@ X-XSS-Protection: 1; mode=block
 ```
 
 <a name="create-open-id-connect-app"></a>
-## Create an OpenID Connect App in Okta
+## Create an OpenID Connect App for Angular
 
-OpenID Connect (OIDC) is built on top of the OAuth 2.0 protocol. It allows clients to verify the identity of the user and, as well as to obtain their basic profile information. To integrate [Okta's Identity Platform](https://developer.okta.com) for user authentication, you'll first need to [register](https://www.okta.com/developer/signup/) and create an OIDC application.
-
-Login to your Okta account, or [create one](https://www.okta.com/developer/signup/) if you don’t have one. Click on **Create an OpenID Connect web application** Navigate to **Admin > Add Applications** and click on the **Create New App** button. Select **Single Page App (SPA)** for the Platform and **OpenID Connect** for the sign on method. Click the **Create** button and give your application a name. On the next screen, add `http://localhost:4200` as a Redirect URI and click **Finish**. You should see settings like the following.
+Login to your Okta account and navigate to **Admin > Add Applications** and click on the **Create New App** button. Select **Single Page App (SPA)** for the Platform and **OpenID Connect** for the sign on method. Click the **Create** button and give your application a name (e.g. Angular PWA). On the next screen, add `http://localhost:4200` as a Redirect URI and click **Finish**. You should see settings like the following.
 
 <!--{% img static/oidc-settings.png alt:"OIDC App Settings" width:"800" %}-->
 
 ![Okta OIDC Settings](static/oidc-settings.png)
 
-Click on the **Assignments** tab and select **Assign** > **Assign to People**. Assign yourself as a user, or someone else that you know the credentials for.
+Click on the **Assignments** tab and select **Assign** > **Assign to Groups**. Select the *Assign* button in the *Everyone* column, and click the **Done** button.
 
 ## Authenticate with OpenID Connect
 
-Start the Angular application by running the following commands.
+Start the Angular application by running the following commands in your project’s root directory.
 
 ```bash
 cd client
@@ -209,7 +196,7 @@ npm install
 ng serve
 ```
 
-If you receive an error like the one below, modify `package.json` to use the latest version of `@angular/cli`. 
+If you receive an error like the one below, modify `package.json` to use the latest version of `@angular/cli` or disable the warning using the instructions below. 
 
 ```
 Your global Angular CLI version (1.0.3) is greater than your local
@@ -233,15 +220,15 @@ To fix this, add the following property to the Spring Boot app's `src/main/resou
 stormpath.web.cors.allowed.originUris=http://localhost:4200
 ```
 
-Also, remove the `@CrossOrigin` annotation from `BeerController.java` since it's no longer needed. 
+Also, remove the `@CrossOrigin` annotation from `BeerController.java` since it's no longer needed. Make sure to save the files you changed and your server auto-restarted. If it did not, kill it and restart it.
 
-Install [Manfred Steyer's](https://github.com/manfredsteyer) project to [add OAuth 2 and OpenID Connect support](https://github.com/manfredsteyer/angular-oauth2-oidc) using npm.
+Install [Manfred Steyer's](https://github.com/manfredsteyer) project to [add OAuth 2 and OpenID Connect support](https://github.com/manfredsteyer/angular-oauth2-oidc) to your Angular client.
 
 ```bash
 npm install --save angular-oauth2-oidc
 ```
 
-Modify `app.component.ts` to import `OAuthService` and configure your app to use your Okta application settings.
+Modify `client/src/app/app.component.ts` to import `OAuthService` and configure your app to use your Okta application settings (replacing `[oidc-client-id]` and `[dev-id]` with the values from your “Angular PWA” OIDC app).
 
 ```typescript
 import { OAuthService } from 'angular-oauth2-oidc';
@@ -262,7 +249,7 @@ import { OAuthService } from 'angular-oauth2-oidc';
 ...
 ```
 
-Modify `src/app/app/app.component.html` to use `<router-outlet>` instead of `<app-beer-list>`.
+Modify `client/src/app/app/app.component.html` to use `<router-outlet>` instead of `<app-beer-list>`.
 
 ```html
 <div *shellNoRender>
@@ -270,7 +257,7 @@ Modify `src/app/app/app.component.html` to use `<router-outlet>` instead of `<ap
 </div>
 ```
 
-Create `src/app/home/home.component.ts` and configure it to have **Login** and **Logout** buttons.
+Create `client/src/app/home/home.component.ts` and configure it to have **Login** and **Logout** buttons.
 
 {% raw %}
 ```typescript
@@ -312,7 +299,7 @@ export class HomeComponent {
 ```
 {% endraw %}
 
-Modify `src/app/shared/beer/beer.service.ts` to read the access token from `oauthService` and add an `Authorization` header.
+Modify `client/src/app/shared/beer/beer.service.ts` to read the access token from `oauthService` and add an `Authorization` header.
 
 ```typescript
 import { Injectable } from '@angular/core';
@@ -331,7 +318,7 @@ export class BeerService {
     const headers: Headers = new Headers();
     headers.append('Authorization', this.oauthService.authorizationHeader());
 
-    let options = new RequestOptions({ headers: headers });
+    const options = new RequestOptions({ headers: headers });
 
     return this.http.get('http://localhost:8080/good-beers', options)
       .map((response: Response) => response.json());
@@ -339,7 +326,7 @@ export class BeerService {
 }
 ```
 
-Create `src/app/shared/auth/auth.guard.service.ts` to navigate to the `HomeComponent` if the user is not authenticated.
+Create `client/src/app/shared/auth/auth.guard.ts` to navigate to the `HomeComponent` if the user is not authenticated.
 
 ```typescript
 import { Injectable } from '@angular/core';
@@ -362,15 +349,16 @@ export class AuthGuard implements CanActivate {
 }
 ```
 
-Import the `OAuthModule` in `app.module.ts`, configure the new `HomeComponent`, and lock the `/beer-list` route down with the `AuthGuard`.
+Add `OAuthModule.forRoot()` to the list of imports in `client/src/app/app.module.ts`, add `HomeComponent` in `declarations`, and lock the `/beer-list` route down with the `AuthGuard`.
 
 ```typescript
 import { OAuthModule } from 'angular-oauth2-oidc';
 import { HomeComponent } from './home/home.component';
-import { AuthGuard } from './shared/auth/auth.guard.service';
+import { RouterModule, Routes } from '@angular/router';
+import { AuthGuard } from './shared/auth/auth.guard;
 
 const appRoutes: Routes = [
-  { path: 'beer-list', component: BeerListComponent, canActivate: [AuthGuard]},
+  { path: 'beer-list', component: BeerListComponent, canActivate: [AuthGuard] },
   { path: 'home', component: HomeComponent },
   { path: '', redirectTo: 'home', pathMatch: 'full' },
   { path: '**', redirectTo: 'home' }
@@ -383,7 +371,8 @@ const appRoutes: Routes = [
   ],
   imports: [
     ...
-    OAuthModule.forRoot()
+    OAuthModule.forRoot(),
+    RouterModule.forRoot(appRoutes)
   ],
   providers: [AuthGuard],
   bootstrap: [AppComponent]
@@ -398,8 +387,17 @@ After making these changes, you should be able to run `ng serve` and see a login
 Click the **Login** button and sign-in with one of the people that's configured in your Okta application.
 
 ![Angular Okta Login](static/angular-okta-login.png)
+ 
+This will likely fail with an error similar to the following:
+ 
+```
+https://dev-158606.oktapreview.com/.well-known/openid-configuration net::ERR_FAILED
+error loading discovery document 
+```
+ 
+To fix this problem, you need to add the client’s URL as a Trusted Origin for a cross-origin request. Login to your Okta dashboard and navigate to **Security** > **API**. Click on the **Trusted Origins** tab and click the **Add Origin** button. Enter `http://localhost:4200` for the Origin URL, give it a name like “Angular PWA”, check **CORS**, and click **Save**.
 
-After logging in, you'll see a welcome message.
+Now you should be able to login and see a welcome message.
 
 ![Angular Welcome](static/angular-welcome.png)
 
@@ -407,7 +405,7 @@ Click on **Beer List** to see data from your Spring Boot app.
 
 ![Angular Beer List](static/angular-beer-list.png)
 
-To add the "Home" link at the top, modify `beer-list.component.html` to have the following HTML.
+To add the "Home" link at the top (as shown in the screenshot above), modify `client/src/app/beer-list/beer-list.component.html` to have the following HTML.
 
 {% raw %}
 ```html
@@ -424,9 +422,6 @@ To add the "Home" link at the top, modify `beer-list.component.html` to have the
         </h3>
       </md-list-item>
     </md-list>
-
-    <p>
-    </p>
   </md-card-content>
 </md-card>
 ```
@@ -448,7 +443,7 @@ Install it using npm:
 npm install @okta/okta-auth-js --save
 ```
 
-Add a reference to this library’s main JavaScript file in `.angular-cli.json`:
+Add a reference to this library’s main JavaScript file in `client/.angular-cli.json`:
 
 ```json
 "scripts": [
@@ -460,7 +455,7 @@ Change `HomeComponent` to declare `OktaAuth` and modify its `template` so it has
 
 {% raw %}
 ```typescript
-declare let OktaAuth: any;
+declare const OktaAuth: any;
 
 @Component({
   template: `
@@ -504,11 +499,11 @@ declare let OktaAuth: any;
 ```
 {% endraw %}
 
-After making these changes, the `HomeComponent` should render as follows.
+After making these changes, run `ng serve` and the `HomeComponent` should render as follows (after you’ve logged out and unchecked “Offline” in the Network tab).
 
 ![Angular Login Form](static/angular-login-form.png)
 
-Import Angular’s `Router`, add it as a dependency in the constructor, and add local variables for the username and password fields. Then implement a `loginWithPassword()` method in `HomeComponent`. This method uses the `OktaAuth` library to get a session token and exchange it for ID and access tokens.
+Import Angular’s `Router`, add it as a dependency in the constructor, and add local variables for the `username` and `password` fields. Then implement a `loginWithPassword()` method in `HomeComponent`. This method uses the `OktaAuth` library to get a session token and exchange it for ID and access tokens.
 
 ```typescript
 import { Router } from '@angular/router';
@@ -545,7 +540,7 @@ export class HomeComponent {
               localStorage.setItem('access_token', tokens[1].accessToken);
               this.oauthService.processIdToken(tokens[0].idToken, tokens[1].accessToken);
               this.router.navigate(['/home']);
-            })
+            });
         } else {
           throw new Error('We cannot handle the ' + response.status + ' status');
         }
@@ -562,9 +557,9 @@ You should be able to sign in using the form, using one of your app's registered
 
 ## Authenticate with Stormpath Angular SDK
 
-If you're a former Stormpath migrating to Okta, you might've used our Angular, AngularJS, or React SDK. The good news is these libraries should still work with Okta! 
+If you're a former Stormpath migrating to Okta, you might've used Stormpath’s Angular, AngularJS, or React SDK. The good news is these libraries should still work with Okta! 
 
-To save the code your wrote for OIDC, I recommend committing your changes to Git.
+To save the code your wrote for OIDC, I recommend committing your changes to Git. Run the command below from the root directory of your project.
 
 ```
 git commit -a -m "Add Security with OIDC and Okta"
@@ -576,19 +571,19 @@ Then create a new branch for the Stormpath Angular SDK integration.
 git checkout -b stormpath
 ```
 
-Install Stormpath’s Angular SDK to make it possible to communicate with the secured server.
+Install Stormpath’s Angular SDK to make it possible to communicate with the secured server. Make sure to run the following command from the `client` directory.
 
 ```
 npm install --save angular-stormpath
 ```
 
-Modify `src/app/app.module.ts` to import `StormpathConfiguration` and `StormpathModule`. Then create a function to configure the `endpointPrefix` to point to `http://localhost:8080`.
+Modify `client/src/app/app.module.ts` to import `StormpathConfiguration` and `StormpathModule`. Then create a function to configure the `endpointPrefix` to point to `http://localhost:8080`.
 
 ```
 import { StormpathConfiguration, StormpathModule } from 'angular-stormpath';
 
 export function stormpathConfig(): StormpathConfiguration {
-  let spConfig: StormpathConfiguration = new StormpathConfiguration();
+  const spConfig: StormpathConfiguration = new StormpathConfiguration();
   spConfig.endpointPrefix = 'http://localhost:8080';
   spConfig.autoAuthorizedUris.push(new RegExp(spConfig.endpointPrefix + '/*'));
   return spConfig;
@@ -613,7 +608,7 @@ Add `StormpathModule` to the imports in `@NgModule` and use the `stormpathConfig
 })
 ```
 
-Modify `home.component.ts` to add the `<sp-authport></sp-authport>` component and a section to show the user’s name and a logout link.
+Modify `client/src/app/home/home.component.ts` to add the `<sp-authport></sp-authport>` component and a section to show the user’s name and a logout link. In other words, replace all the code in `home.component.ts` with the code below.
 
 ```typescript
 import { Component } from '@angular/core';
@@ -638,7 +633,7 @@ export class HomeComponent extends AuthPortComponent {
 
 You’ll notice the `user$` variable in the HTML. This comes from `AuthPortComponent`, which `HomeComponent` extends.
 
-You'll need to make two more changes to `AuthGuard` and `BeerService`. In `src/app/shared/auth/auth.guard.service.ts`, replace `OAuthService` with `Stormpath`.
+You'll need to make two more changes to `AuthGuard` and `BeerService`. In `client/src/app/shared/auth/auth.guard.ts`, replace `OAuthService` with `Stormpath`.
 
 ```typescript
 import { Injectable } from '@angular/core';
@@ -661,7 +656,7 @@ export class AuthGuard implements CanActivate {
 }
 ```
 
-The Angular SDK will automatically send `Authorization` headers to `http://localhost:8080/*` based on the `autoAuthorizedUris` setting in `app.module.ts`. However, you can modify `beer.service.ts` so this URL isn't duplicated.
+The Stormpath Angular SDK will automatically send `Authorization` headers to `http://localhost:8080/*` based on the `autoAuthorizedUris` setting in `app.module.ts`. However, you can modify `beer.service.ts` so this URL isn't duplicated.
 
 ```typescript
 import { Injectable } from '@angular/core';
@@ -682,8 +677,22 @@ export class BeerService {
   }
 }
 ```
-
-Make sure your server is started (with `mvn spring-boot:run` in the server directory, and `ng serve` in the client directory) and navigate to http://localhost:4200. You should see a login screen like the one below and see the same post-login screen as you did with OIDC.
+ 
+The template for the `<sp-authport>` component expects Bootstrap’s CSS to be available. To add Bootstrap, install it from the `client` directory using npm.
+ 
+```
+npm install --save bootstrap@3.3.7
+```
+ 
+Add a reference to Bootstrap’s CSS file in `client/.angular-cli.json`:
+ 
+```
+"styles": [
+  "styles.css",
+  "../node_modules/bootstrap/dist/css/bootstrap.min.css"
+],
+```
+Make sure your app is started (with `mvn spring-boot:run` in the `server` directory, and `ng serve` in the `client` directory) and navigate to http://localhost:4200. You should see a login screen like the one below and see the same post-login screen as you did with OIDC.
 
 **NOTE:** If you still see the OIDC login screen, it's because PWAs often get "stuck" in your browser. In Chrome Developer Tools, navigate to the **Application** tab > **Clear storage** and click the **Clear selected** button at the bottom. You can also open an incognito window.
 
@@ -698,11 +707,17 @@ There are a couple of issues I found when writing this tutorial. Please subscrib
 
 Now it's time for one of the coolest places on the internet - *production!*
 
-Before you deploy these applications to production, I recommend stopping both. That way there's no resource contention for file access. 
+Before you deploy these applications to production, I recommend stopping both. That way there's no resource contention for file access. Commit your changes to the `stormpath` branch and checkout the `master` branch.
+ 
+```
+git commit -a -m “Integrate Stormpath Angular SDK for login”
+git checkout master
+```
 
-To deploy this app to Cloud Foundry, you'll need 1) to update `deploy.sh` in the root directory to set environment variables, 2) set the URL of the server in a different file, and 3) add `pushstate: enabled` to  `Staticfile`. You can see the [modified deploy.sh on GitHub](https://github.com/oktadeveloper/okta-spring-boot-angular-pwa-example/blob/master/deploy.sh).
+To deploy this app to Cloud Foundry, you'll need 1) to update `deploy.sh` in the root directory to set environment variables, 2) set the URL of the server in a different file, and 3) add `pushstate: enabled` to  `Staticfile`. You can see the [modified deploy.sh on GitHub](https://github.com/oktadeveloper/okta-spring-boot-angular-pwa-example/blob/master/deploy.sh). Copy the contents of this file on top of your existing `deploy.sh`.
 
 // todo: IMO, this note will look better if it has a box around it, like a callout of sorts
+----
 **NOTE:** An alternative to enabling push state is to use hashes in the URL. To do this, you can pass in `{useHash: true}` when creating your routes. 
           
 ```typescript
@@ -710,6 +725,7 @@ RouterModule.forRoot(appRoutes, {useHash: true})
 ```
 
 Unfortunately, this causes the redirect login button to fail since there will be two hashes in the URL.
+----
 
 [Install the Cloud Foundry CLI](https://docs.cloudfoundry.org/cf-cli/install-go-cli.html), then log into [Pivotal Web Services](http://run.pivotal.io/). 
 
@@ -731,11 +747,11 @@ To fix this, modify the Trusted Origins on Okta (under **Security** > **API**) t
 
 ![Add Trusted Origin](static/add-cf-origin.png)
 
-This makes the cross-origin error go away, but it will cause an invalid redirect issue when you try to login with the first login button. 
+This makes the cross-origin error go away, but it will cause an invalid request issue when you try to login with the first login button. 
 
 ![Invalid Redirect URI](static/invalid-redirect.png)
 
-To fix this, modify the `Redirect URIs` for your OIDC application in Okta. 
+To fix this, modify the `Redirect URIs` for your “Angular PWA” OIDC application in Okta. 
 
 ![OIDC Redirect URIs](static/oidc-settings-cf-redirect.png)
 
@@ -757,13 +773,15 @@ I followed the advice in the report and added the following in the list of `icon
 }
 ```
 
-When I re-deployed with this change, I received a 100. *Huzzah!*
+When I re-deployed (by running `./deploy.sh` again) with this change, I received a 100. *Huzzah!*
+
+*NOTE:* I did have to update the Trusted Origins and Redirect URIs in Okta after I redeployed since `deploy.sh` picks a random name to deploy to each time.
 
 ![Lighthouse Perfect Score](static/lighthouse-with-512.png)
 
 ## Happy Authenticating!
 
-You can find the source code associated with this article [on GitHub](https://github.com/oktadeveloper/okta-spring-boot-angular-pwa-example). If you find any bugs, please file an issue, or leave a comment on this post. Of course, you can always [ping me on Twitter](https://twitter.com/mraible) too.
+You can find the source code associated with this article [on GitHub](https://github.com/oktadeveloper/okta-spring-boot-angular-pwa-example). If you find any bugs, please file an issue, or post your question to the [Okta Developer Forums](https://devforum.okta.com/). Of course, you can always [ping me on Twitter](https://twitter.com/mraible) too.
 
 This article showed you how to develop a Spring Boot backend, and lock it down with Okta. You learned how to develop an Angular front end and use OpenID Connect to get an access token and securely communicate with the backend. You also learned how you can use the Stormpath Angular SDK to do the same thing. Finally, you saw how to deploy everything to Cloud Foundry and get a Lighthouse PWA score of 100.
 
