@@ -131,7 +131,7 @@ cd server
 ./mvnw spring-boot:run
 ```
 
-Navigate to <http://localhost:8080> and you'll be prompted to login.
+Navigate to <http://localhost:8080> and you'll be prompted to log in.
 
 ![Spring Boot Login](static/spring-boot-login.png)
 
