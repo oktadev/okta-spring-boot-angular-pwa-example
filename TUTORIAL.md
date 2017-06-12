@@ -563,7 +563,9 @@ You should be able to sign in with the form as one of your app's registered user
 
 ## Authenticate with the Stormpath Angular SDK
 
-If you're a former Stormpath customer migrating to Okta, you might've used our Angular, AngularJS, or React SDKs. The good news is that these libraries should still work with Okta! ** -- what if they weren't a stormpath user? there's no way to register for stormpath anymore... can they still download and use the sdk? i assume they can... either way, we should add a line about new okta users trying this out, andk how they can expect it to be supported going forward.**
+If you're a former Stormpath customer migrating to Okta, you might've used our Angular, AngularJS, or React SDKs. The good news is that these libraries should still work with Okta! 
+
+Even if you weren't a Stormpath customer, you can still use these libraries to talk to Okta. In the future, we'll be releasing Okta SDKs with similar functionality. In the meantime, we'll do our best to support these libraries and make it easy to transition to future versions.
 
 To save the code your wrote for OIDC, I recommend committing your changes to Git.
 
@@ -718,8 +720,6 @@ RouterModule.forRoot(appRoutes, {useHash: true})
 
 Unfortunately, this causes the redirect login button to fail since there are now two hashes in the URL.
 
-// Is the stuff below the solve for that line above?
-
 [Install the Cloud Foundry CLI](https://docs.cloudfoundry.org/cf-cli/install-go-cli.html), then log into [Pivotal Web Services](http://run.pivotal.io/). 
 
 ```
@@ -781,12 +781,8 @@ To learn more about PWAs, check out some recent tutorials I wrote:
 * [Build Your First Progressive Web Application with Angular and Spring Boot](http://developer.okta.com/blog/2017/05/09/progressive-web-applications-with-angular-and-spring-boot) 
 * [Tutorial: Develop a Mobile App With Ionic and Spring Boot](http://developer.okta.com/blog/2017/05/17/develop-a-mobile-app-with-ionic-and-spring-boot)
 
-There's also a number of excellent resources by Google, Pluralsight, and Smashing Magazine:
+There's also a number of excellent resources by Google and Smashing Magazine:
 
 * Addy Osmani at Google I/O '17: [Production Progressive Web Apps With JavaScript Frameworks](https://youtu.be/aCMbSyngXB4)
 * Google's [Progressive Web Apps](https://developers.google.com/web/progressive-web-apps/) homepage, [step-by-step code lab](https://codelabs.developers.google.com/codelabs/your-first-pwapp/), and [instructor-led PWA training](https://developers.google.com/web/ilt/pwa/).
-* Pluralsight's [Getting Started with Progressive Web Apps](https://www.pluralsight.com/courses/web-apps-progressive-getting-started)
-* [A Beginner's Guide To Progressive Web Apps](https://www.smashingmagazine.com/2016/08/a-beginners-guide-to-progressive-web-apps/)
-
-// let's kill the last link here, and add your scotch post's url to the list above. i'll work on getting that URL for you
- 
+* [A Beginner's Guide To Progressive Web Apps](https://www.smashingmagazine.com/2016/08/a-beginners-guide-to-progressive-web-apps/) 
