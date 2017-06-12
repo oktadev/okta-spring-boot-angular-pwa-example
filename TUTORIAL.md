@@ -53,8 +53,6 @@ In this project's `server/pom.xml` file, you'll need to add the following XML:
 ```
 
 ## Get Started with Okta
-
-**Should I just link to https://github.com/stormpath/stormpath-sdk-java/blob/okta/OktaGettingStarted.md instead of putting all of this painfulness in the article?** --No, let's do what we did at Stormpath, as best we can. Include the shortest, most MVP version that someone could possibly follow successfully, and then link to the longer so they can go there if they get stuck. Ideally, we want to keep readers on this page.
  
 To begin, you'll need to create an Okta Developer account. This account is free forever and provides the complete Okta Identity Platform for up to 3 applications and 100 users.
 
