@@ -8,7 +8,7 @@ import { AuthPortComponent } from 'angular-stormpath';
       <md-card-title>Welcome, {{ ( user$ | async ).fullName }}!</md-card-title>
       <md-card-content>
         <button md-raised-button (click)="logout(); return">Logout</button>
-        <a md-button routerLink="/beer-list" routerLinkActive="active">Beer List</a>
+        <a md-button routerLink="/beer-list">Beer List</a>
       </md-card-content>
     </md-card>
 

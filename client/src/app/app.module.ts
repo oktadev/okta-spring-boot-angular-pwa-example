@@ -9,9 +9,10 @@ import { BeerService } from './shared/beer/beer.service';
 import { GiphyService } from './shared/giphy/giphy.service';
 import { MaterialModule } from '@angular/material';
 import { AppShellModule } from '@angular/app-shell';
+import { OAuthModule } from 'angular-oauth2-oidc';
 import { HomeComponent } from './home/home.component';
-import { AuthGuard } from './shared/auth/auth.guard.service';
 import { RouterModule, Routes } from '@angular/router';
+import { AuthGuard } from './shared/auth/auth.guard';
 import { StormpathConfiguration, StormpathModule } from 'angular-stormpath';
 
 const appRoutes: Routes = [
@@ -22,7 +23,7 @@ const appRoutes: Routes = [
 ];
 
 export function stormpathConfig(): StormpathConfiguration {
-  let spConfig: StormpathConfiguration = new StormpathConfiguration();
+  const spConfig: StormpathConfiguration = new StormpathConfiguration();
   spConfig.endpointPrefix = 'http://localhost:8080';
   spConfig.autoAuthorizedUris.push(new RegExp(spConfig.endpointPrefix + '/*'));
   return spConfig;
@@ -40,6 +41,7 @@ export function stormpathConfig(): StormpathConfiguration {
     HttpModule,
     MaterialModule,
     AppShellModule.runtime(),
+    OAuthModule.forRoot(),
     RouterModule.forRoot(appRoutes),
     StormpathModule
   ],
