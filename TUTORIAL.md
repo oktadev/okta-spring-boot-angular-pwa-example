@@ -12,6 +12,8 @@ In this example, you'll use a Stormpath's Spring Boot Starter to add security to
 
 Then I'll show you how you can use OIDC and Okta's Auth SDK in an Angular app to login and get data from the Spring Boot app. Finally, I'll show how Stormpath's Angular SDK has similar functionality to the Spring Boot Starter, providing login, user registration, and forgot password features.
 
+I recently created a Sping Boot app that provides a list of good beers, based on a pre-populated list. It filters out less-than-great beers and displays them in an Angular UI that displays the first animated GIF (from Giphy) that matches the beer name.
+
 Let's get started! 
 
 Rather than building Spring Boot and Angular applications from scratch, you can clone an existing GitHub project to get you going quickly.
@@ -740,7 +742,7 @@ To fix this, modify the Trusted Origins on Okta (under **Security** > **API**) t
 
 ![Add Trusted Origin](static/add-cf-origin.png)
 
-This makes the cross-origin error go away, but it will cause an invalid redirect issue when you try to login with the first login button. 
+This makes the cross-origin error go away, but it will cause an invalid redirect issue when you try to log in with the first login button. 
 
 ![Invalid Redirect URI](static/invalid-redirect.png)
 
