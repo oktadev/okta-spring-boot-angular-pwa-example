@@ -12,8 +12,6 @@ In this example, you'll use a Stormpath's Spring Boot Starter to add security to
 
 Then I'll show you how you can use OIDC and Okta's Auth SDK in an Angular app to login and get data from the Spring Boot app. Finally, I'll show how Stormpath's Angular SDK has similar functionality to the Spring Boot Starter, providing login, user registration, and forgot password features.
 
-// I think we need a sentence somewhere early on introducing the beer list app concept, otherwise ppl start seeing beer variables in the code with no context for them
-
 Let's get started! 
 
 Rather than building Spring Boot and Angular applications from scratch, you can clone an existing GitHub project to get you going quickly.
@@ -55,8 +53,6 @@ In this project's `server/pom.xml` file, you'll need to add the following XML:
 ## Get Started with Okta
 
 **Should I just link to https://github.com/stormpath/stormpath-sdk-java/blob/okta/OktaGettingStarted.md instead of putting all of this painfulness in the article?** --No, let's do what we did at Stormpath, as best we can. Include the shortest, most MVP version that someone could possibly follow successfully, and then link to the longer so they can go there if they get stuck. Ideally, we want to keep readers on this page.
-
-*If so, you might want to grammar check that bad boy, it says to "press" buttons instead of "click" them.* --Oh lord. Adding it to the list, thanks!
  
 To begin, you'll need to create an Okta Developer account. This account is free forever and provides the complete Okta Identity Platform for up to 3 applications and 100 users.
 
@@ -98,7 +94,7 @@ Your application has been created, but you still have a few settings to change.
 1. On the *General* tab, click **Edit** on the **General Settings** panel
 2. Check the *Refresh Token*, and *Resource Owner Password* checkboxes click **Save**
 3. Click **Edit** on the Client Credentials panel
-4. Select the *Use Client Authentication* radio button, and click the **Save** button ** --is it radio or radial? I always thought radial**
+4. Select the *Use Client Authentication* radio button, and click the **Save** button 
 5. Click on the *Groups* tab
 6. Select *Assign* in the *Everyone* column, and click **Done**
 7. Grab the ID portion of the URL of your browser's current page, for example: if my URL was: `https://dev-123456-admin.oktapreview.com/admin/app/oidc_client/instance/00icu81200icu812/#tab-groups` then `00icu81200icu812` is my application's ID
@@ -130,8 +126,6 @@ Now, start it up...
 
 To make your Spring Boot app aware of your Okta settings, you need to set a few environment variables. You can also use [other options](https://docs.stormpath.com/java/servlet-plugin/config.html) for setting these variables. 
 
-// you said this already, look up there ^
-
 ```bash
 export STORMPATH_CLIENT_BASEURL=[baseurl_from_above]
 export OKTA_APPLICATION_ID=[application_id_from_above]
@@ -146,8 +140,6 @@ cd server
 ```
 
 Navigate to <http://localhost:8080> and you'll be prompted to log in. 
-
-// log in vs login = verb vs noun, aka, we log in on the login page
 
 ![Spring Boot Login](static/spring-boot-login.png)
 
@@ -194,7 +186,7 @@ X-XSS-Protection: 1; mode=block
 <a name="create-open-id-connect-app"></a>
 ## Create an OpenID Connect App in Okta
 
-OpenID Connect (OIDC) is built on top of the OAuth 2.0 protocol. It allows clients to verify the identity of the user and, as well as to obtain their basic profile information. To integrate [Okta's Identity Platform](https://developer.okta.com) for user authentication, you'll first need to [register](https://www.okta.com/developer/signup/) ** -- presumably they've already done this, since you just walked them thru it. assume they have just jump into the next bit** and create an OIDC application.
+OpenID Connect (OIDC) is built on top of the OAuth 2.0 protocol. It allows clients to verify the identity of the user and, as well as to obtain their basic profile information. To get started you'll need to:
 
 1. Login to your Okta account and click on **Create an OpenID Connect web application** 
 2. Navigate to **Admin > Add Applications** and click on **Create New App** 
@@ -445,7 +437,7 @@ Now, if you toggle "offline" in Chrome Developer Tools' Network tab, you'll see 
 
 ![Angular PWA Works Offline](static/angular-beer-list-offline.png)
 
-If it works - great! Continue reading to learn how to use the [Okta Auth SDK](https://github.com/okta/okta-auth-js) with `OAuthService` to build a login form for your app. ** -- let's assume they want to read on ;)**
+If it works - great, now we can add auth with Okta!
 
 ### Authenticating with the Okta Auth SDK
 
