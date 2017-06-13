@@ -28,7 +28,7 @@ In this project's `server/pom.xml` file, you'll need to add the following XML:
 
 ```xml
 <properties>
-    <stormpath.version>2.0.0-okta-rc1</stormpath.version>
+    <stormpath.version>2.0.0-okta-rc2</stormpath.version>
 </properties>
 
 <dependencies>
@@ -95,8 +95,9 @@ Your application has been created, but you still have a few settings to change.
 2. Check the *Refresh Token*, and *Resource Owner Password* checkboxes click **Save**
 3. Click **Edit** on the Client Credentials panel
 4. Select the *Use Client Authentication* radio button, and click the **Save** button 
-5. Click on the *Assignments* tab and then select the *Assign* button and **Assign to Groups**5. Select the *Assign* button in the *Everyone* column, and click the **Done** button
-6. Grab the ID portion of the URL of your browsers current page, for example: if my URL was: `https://dev-123456-admin.oktapreview.com/admin/app/oidc_client/instance/00icu81200icu812/#tab-assignments` then `00icu81200icu812` is your application's ID
+5. Click on the *Assignments* tab and then select the *Assign* button and **Assign to Groups**
+6. Select the *Assign* button in the *Everyone* column, and click the **Done** button
+7. Grab the ID portion of the URL of your browsers current page, for example: if my URL was: `https://dev-123456-admin.oktapreview.com/admin/app/oidc_client/instance/00icu81200icu812/#tab-assignments` then `00icu81200icu812` is your application's ID
 
 **Important:** You will need to remember your application's ID.
 
