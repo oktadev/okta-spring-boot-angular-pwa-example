@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { OAuthService } from 'angular-oauth2-oidc';
 import { Router } from '@angular/router';
-declare let OktaAuth: any;
+declare const OktaAuth: any;
 
 @Component({
   template: `
@@ -54,6 +54,18 @@ export class HomeComponent {
     this.oauthService.initImplicitFlow();
   }
 
+  logout() {
+    this.oauthService.logOut();
+  }
+
+  get givenName() {
+    const claims = this.oauthService.getIdentityClaims();
+    if (!claims) {
+      return null;
+    }
+    return claims.name;
+  }
+
   loginWithPassword() {
     this.oauthService.createAndSaveNonce().then(nonce => {
       const authClient = new OktaAuth({
@@ -73,10 +85,12 @@ export class HomeComponent {
             redirectUri: window.location.origin
           })
             .then((tokens) => {
+              // oauthService.processIdToken doesn't set an access token
+              // set it manually so oauthService.authorizationHeader() works
               localStorage.setItem('access_token', tokens[1].accessToken);
               this.oauthService.processIdToken(tokens[0].idToken, tokens[1].accessToken);
               this.router.navigate(['/home']);
-            })
+            });
         } else {
           throw new Error('We cannot handle the ' + response.status + ' status');
         }
@@ -85,17 +99,5 @@ export class HomeComponent {
         this.error = error.message;
       });
     });
-  }
-
-  logout() {
-    this.oauthService.logOut();
-  }
-
-  get givenName() {
-    const claims = this.oauthService.getIdentityClaims();
-    if (!claims) {
-      return null;
-    }
-    return claims.name;
   }
 }

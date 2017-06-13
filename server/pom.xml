@@ -22,7 +22,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>1.8</java.version>
-        <stormpath.version>2.0.0-okta-rc1</stormpath.version>
+        <stormpath.version>2.0.0-okta-rc2</stormpath.version>
     </properties>
 
     <dependencies>

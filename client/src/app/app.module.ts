@@ -11,8 +11,8 @@ import { MaterialModule } from '@angular/material';
 import { AppShellModule } from '@angular/app-shell';
 import { OAuthModule } from 'angular-oauth2-oidc';
 import { HomeComponent } from './home/home.component';
-import { AuthGuard } from './shared/auth/auth.guard.service';
 import { RouterModule, Routes } from '@angular/router';
+import { AuthGuard } from './shared/auth/auth.guard';
 
 const appRoutes: Routes = [
   { path: 'beer-list', component: BeerListComponent, canActivate: [AuthGuard] },
@@ -33,8 +33,8 @@ const appRoutes: Routes = [
     HttpModule,
     MaterialModule,
     AppShellModule.runtime(),
-    RouterModule.forRoot(appRoutes),
     OAuthModule.forRoot(),
+    RouterModule.forRoot(appRoutes)
   ],
   providers: [BeerService, GiphyService, AuthGuard],
   bootstrap: [AppComponent]
