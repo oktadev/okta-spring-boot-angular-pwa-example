@@ -216,7 +216,12 @@ not allowed access. The response had HTTP status code 403. If an opaque response
 your needs, set the request's mode to 'no-cors' to fetch the resource with CORS disabled.
 ```
 
-To fix this, add the following property to the Spring Boot app's `src/main/resources/application.properties`.
+When you're using Spring Boot without Stormpath, you can use a `@CrossOrigin` annotation to enable cross-origin resource 
+sharing (CORS) on the server. See the [configure CORS for Spring Boot section](https://developer.okta.com/blog/2017/04/26/bootiful-development-with-spring-boot-and-angular#configure-cors-for-spring-boot) of 
+[Bootiful Development with Spring Boot and Angular](https://developer.okta.com/blog/2017/04/26/bootiful-development-with-spring-boot-and-angular).
+
+When you're using the Stormpath Spring Boot Starter, you can enable it by adding the following property to the Spring 
+Boot app's `src/main/resources/application.properties`.
 
 ```
 stormpath.web.cors.allowed.originUris=http://localhost:4200
@@ -357,7 +362,7 @@ Add `OAuthModule.forRoot()` to the list of imports in `client/src/app/app.module
 import { OAuthModule } from 'angular-oauth2-oidc';
 import { HomeComponent } from './home/home.component';
 import { RouterModule, Routes } from '@angular/router';
-import { AuthGuard } from './shared/auth/auth.guard;
+import { AuthGuard } from './shared/auth/auth.guard';
 
 const appRoutes: Routes = [
   { path: 'beer-list', component: BeerListComponent, canActivate: [AuthGuard] },
