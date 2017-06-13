@@ -97,7 +97,7 @@ Your application has been created, but you still have a few settings to change.
 4. Select the *Use Client Authentication* radio button, and click the **Save** button 
 5. Click on the *Assignments* tab and then select the *Assign* button and **Assign to Groups**
 6. Select the *Assign* button in the *Everyone* column, and click the **Done** button
-7. Grab the ID portion of the URL of your browsers current page, for example: if my URL was: `https://dev-123456-admin.oktapreview.com/admin/app/oidc_client/instance/00icu81200icu812/#tab-assignments` then `00icu81200icu812` is your application's ID
+7. Grab the ID portion of the URL of your browsers current page, for example: if my URL was: `https://dev-123456-admin.oktapreview.com/admin/app/oidc_client/instance/00icu81200icu812/#tab-assignments` then `00icu81200icu812` is my application's ID
 
 **Important:** You will need to remember your application's ID.
 
