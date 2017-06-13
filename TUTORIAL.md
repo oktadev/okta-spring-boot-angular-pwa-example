@@ -711,14 +711,15 @@ To deploy this app to Cloud Foundry, you'll need to
 
 You can see the [modified deploy.sh on GitHub](https://github.com/oktadeveloper/okta-spring-boot-angular-pwa-example/blob/master/deploy.sh).
 
-// todo: IMO, this note will look better if it has a box around it, like a callout of sorts -- agree
-**NOTE:** An alternative to enabling push state is to use hashes in the URL. To do this, you can pass in `{useHash: true}` when creating your routes. 
+<blockquote>
+<strong>NOTE:</strong> An alternative to enabling push state is to use hashes in the URL. To do this, you can pass in `{useHash: true}` when creating your routes. 
           
 ```typescript
 RouterModule.forRoot(appRoutes, {useHash: true})
 ```
 
 Unfortunately, this causes the redirect login button to fail since there are now two hashes in the URL.
+</blockquote>
 
 [Install the Cloud Foundry CLI](https://docs.cloudfoundry.org/cf-cli/install-go-cli.html), then log into [Pivotal Web Services](http://run.pivotal.io/). 
 
