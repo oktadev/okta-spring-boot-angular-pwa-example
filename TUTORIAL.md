@@ -720,7 +720,7 @@ Now it's time for one of the coolest places on the internet - *production!*
 Before you deploy these applications to production, I recommend stopping both. That way there's no resource contention for file access. Commit your changes to the `stormpath` branch and checkout the `master` branch.
  
 ```
-git commit -a -m “Integrate Stormpath Angular SDK for login”
+git commit -a -m "Integrate Stormpath Angular SDK for login"
 git checkout master
 ```
 
