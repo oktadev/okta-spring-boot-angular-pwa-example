@@ -41,7 +41,7 @@ mvn clean package -DskipTests
 # replace the client URL in the server
 sed -i -e "s|http://localhost:4200|$clientUri|g" $r/server/src/main/resources/application.properties
 
-heroku deploy:jar target/*jar -r server
+heroku deploy:jar target/*jar -r server -o "--server.port=\$PORT"
 heroku config:set -r server \
   FORCE_HTTPS="true" \
   STORMPATH_CLIENT_BASEURL="$STORMPATH_CLIENT_BASEURL" \
