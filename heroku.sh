@@ -43,9 +43,9 @@ sed -i -e "s|http://localhost:4200|$clientUri|g" $r/server/src/main/resources/ap
 
 heroku deploy:jar target/*jar -r server
 heroku config:set -r server \
-  FORCE_HTTPS="true"
-  STORMPATH_CLIENT_BASEURL="$STORMPATH_CLIENT_BASEURL"
-  OKTA_APPLICATION_ID="$OKTA_APPLICATION_ID"
+  FORCE_HTTPS="true" \
+  STORMPATH_CLIENT_BASEURL="$STORMPATH_CLIENT_BASEURL" \
+  OKTA_APPLICATION_ID="$OKTA_APPLICATION_ID" \
   OKTA_API_TOKEN="$OKTA_API_TOKEN"
 
 # Deploy the client
@@ -73,10 +73,12 @@ cat << EOF > build.json
   "source_blob": { "url" : "$get_url" }
 }
 EOF
-curl -n -s -o /dev/null -X POST https://api.heroku.com/apps/$client_app/builds \
+build_out=$(curl -n -s -X POST https://api.heroku.com/apps/$client_app/builds \
   -d "$(cat build.json)" \
   -H 'Accept: application/vnd.heroku+json; version=3' \
-  -H "Content-Type: application/json"
+  -H "Content-Type: application/json")
+output_stream_url=$(echo "$build_out" | python -c 'import json,sys;obj=json.load(sys.stdin);print obj["output_stream_url"]')
+curl -s -L "$output_stream_url"
 
 rm build.json
 rm ../dist.tgz
