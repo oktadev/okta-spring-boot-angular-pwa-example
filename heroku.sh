@@ -22,7 +22,7 @@ if ! echo "$(git remote -v)" | grep -q pwa-server-; then
   server_app=pwa-server-$RANDOM
   heroku create -r server $server_app
 else
-  server_app=$(heroku apps:info -r server --json | python -c 'import json,sys;obj=json.load(sys.stdin);print obj["app"]["name"]')
+  server_app=$(heroku apps:info -r server --json | python -c 'import json,sys;print json.load(sys.stdin)["app"]["name"]')
 fi
 serverUri="https://$server_app.herokuapp.com"
 
@@ -30,7 +30,7 @@ if ! echo "$(git remote -v)" | grep -q pwa-client-; then
   client_app=pwa-client-$RANDOM
   heroku create -r client $client_app
 else
-  client_app=$(heroku apps:info -r client --json | python -c 'import json,sys;obj=json.load(sys.stdin);print obj["app"]["name"]')
+  client_app=$(heroku apps:info -r client --json | python -c 'import json,sys;print json.load(sys.stdin)["app"]["name"]')
 fi
 clientUri="https://$client_app.herokuapp.com"
 
@@ -64,8 +64,8 @@ tar -zcvf ../dist.tgz .
 
 # TODO replace this with the heroku-cli-static command `heroku static:deploy`
 source=$(curl -n -X POST https://api.heroku.com/apps/$client_app/sources -H 'Accept: application/vnd.heroku+json; version=3')
-get_url=$(echo "$source" | python -c 'import json,sys;obj=json.load(sys.stdin);print obj["source_blob"]["get_url"]')
-put_url=$(echo "$source" | python -c 'import json,sys;obj=json.load(sys.stdin);print obj["source_blob"]["put_url"]')
+get_url=$(echo "$source" | python -c 'import json,sys;print json.load(sys.stdin)["source_blob"]["get_url"]')
+put_url=$(echo "$source" | python -c 'import json,sys;print json.load(sys.stdin)["source_blob"]["put_url"]')
 curl "$put_url" -X PUT -H 'Content-Type:' --data-binary @../dist.tgz
 cat << EOF > build.json
 {
@@ -77,7 +77,7 @@ build_out=$(curl -n -s -X POST https://api.heroku.com/apps/$client_app/builds \
   -d "$(cat build.json)" \
   -H 'Accept: application/vnd.heroku+json; version=3' \
   -H "Content-Type: application/json")
-output_stream_url=$(echo "$build_out" | python -c 'import json,sys;obj=json.load(sys.stdin);print obj["output_stream_url"]')
+output_stream_url=$(echo "$build_out" | python -c 'import json,sys;print json.load(sys.stdin)["output_stream_url"]')
 curl -s -L "$output_stream_url"
 
 rm build.json
