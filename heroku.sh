@@ -58,7 +58,15 @@ yarn && ng build --prod --aot
 python $r/sw.py
 cd dist
 
-echo "{\"root\": \".\"}" > static.json
+cat << EOF > static.json
+{
+  "root": ".",
+  "routes": {
+    "/**": "index.html"
+  }
+}
+EOF
+
 rm -f ../dist.tgz
 tar -zcvf ../dist.tgz .
 
