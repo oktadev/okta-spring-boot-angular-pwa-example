@@ -60,6 +60,7 @@ cd dist
 
 cat << EOF > static.json
 {
+  "https_only": true,
   "root": ".",
   "routes": {
     "/**": "index.html"
@@ -90,8 +91,6 @@ curl -s -L "$output_stream_url"
 
 rm build.json
 rm ../dist.tgz
-
-heroku config:set FORCE_HTTPS="true" -r client
 
 # cleanup changed files
 git checkout $r/client
