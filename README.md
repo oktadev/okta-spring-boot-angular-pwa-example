@@ -29,4 +29,6 @@ See [deploy.sh](deploy.sh) to see how to deploy to Cloud Foundry. See [heroku.sh
 
 You can see that this app scores 100 as a PWA using [Lighthouse](https://developers.google.com/web/tools/lighthouse/).
 
-|![Lighthouse on Cloud Foundry](static/lighthouse-with-512.png)|![Lighthouse on Heroku](static/lighthouse-heroku.png)|
+Cloud Foundry                                                  |  Heroku
+:-------------------------------------------------------------:|:----------------------------------------------------:
+![Lighthouse on Cloud Foundry](static/lighthouse-with-512.png) | ![Lighthouse on Heroku](static/lighthouse-heroku.png)
