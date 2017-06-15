@@ -94,7 +94,6 @@ rm ../dist.tgz
 git checkout $r/client
 git checkout $r/server
 rm $r/client/src/app/shared/beer/beer.service.ts-e
-rm $r/server/src/main/resources/application.properties-e
 
 # show apps and URLs
 heroku open -r client
