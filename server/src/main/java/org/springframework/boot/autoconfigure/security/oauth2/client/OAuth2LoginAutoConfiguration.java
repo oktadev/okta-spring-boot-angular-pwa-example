@@ -15,6 +15,8 @@
  */
 package org.springframework.boot.autoconfigure.security.oauth2.client;
 
+import com.example.jwt.JWTConfigurer;
+import com.example.jwt.TokenProvider;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
@@ -30,6 +32,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfiguration;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.annotation.web.configurers.oauth2.client.OAuth2LoginConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.client.user.converter.AbstractOAuth2UserConverter;
 import org.springframework.security.oauth2.core.user.OAuth2User;
@@ -60,9 +63,11 @@ public class OAuth2LoginAutoConfiguration {
 	@EnableWebSecurity
 	protected static class OAuth2LoginSecurityConfiguration extends WebSecurityConfigurerAdapter {
 		private final Environment environment;
+		private final TokenProvider tokenProvider;
 
-		protected OAuth2LoginSecurityConfiguration(Environment environment) {
+		protected OAuth2LoginSecurityConfiguration(Environment environment, TokenProvider tokenProvider) {
 			this.environment = environment;
+			this.tokenProvider = tokenProvider;
 		}
 
 		// @formatter:off
@@ -72,12 +77,17 @@ public class OAuth2LoginAutoConfiguration {
 				.authorizeRequests()
 					.antMatchers("/favicon.ico").permitAll()
 					.anyRequest().authenticated()
-					.and()
-				.oauth2Login();
+                    .and()
+				.oauth2Login()
+					.and().apply(securityConfigurerAdapter());
 
 			this.registerUserInfoTypeConverters(http.oauth2Login());
 		}
 		// @formatter:on
+
+		private JWTConfigurer securityConfigurerAdapter() {
+			return new JWTConfigurer(tokenProvider);
+		}
 
 		private void registerUserInfoTypeConverters(OAuth2LoginConfigurer<HttpSecurity> oauth2LoginConfigurer) throws Exception {
 			Set<String> clientPropertyKeys = resolveClientPropertyKeys(this.environment);
