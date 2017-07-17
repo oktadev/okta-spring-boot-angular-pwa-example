@@ -4,7 +4,7 @@ Example app that shows how to add Authentication with Okta to an Angular PWA tha
 
 To see how this application was created, please read [Add Authentication to Your Angular PWA](https://developer.okta.com/blog/2017/06/13/add-authentication-angular-pwa) on the Okta Developer blog.
 
-You will need to have an [Okta Dewveloper account](https://developer.okta.com/signup/) and environment variables
+You will need to have an [Okta Developer account](https://developer.okta.com/signup/) and environment variables
 configured to run this application.
 
 To run the server, cd into the `server` folder and run `mvn spring-boot:run`.
