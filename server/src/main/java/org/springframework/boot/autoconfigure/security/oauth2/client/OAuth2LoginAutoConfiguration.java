@@ -77,9 +77,12 @@ public class OAuth2LoginAutoConfiguration {
 				.authorizeRequests()
 					.antMatchers("/favicon.ico").permitAll()
 					.anyRequest().authenticated()
-                    .and()
-				.oauth2Login()
-					.and().apply(securityConfigurerAdapter());
+                .and().
+					cors()
+				.and()
+					.oauth2Login()
+				.and()
+					.apply(securityConfigurerAdapter());
 
 			this.registerUserInfoTypeConverters(http.oauth2Login());
 		}
