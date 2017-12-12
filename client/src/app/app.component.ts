@@ -14,7 +14,7 @@ export class AppComponent {
     this.oauthService.clientId = 'No2NYX8cgeb8c9LUXGD3';
     this.oauthService.scope = 'openid profile email';
     this.oauthService.oidc = true;
-    this.oauthService.issuer = 'https://dev-158606.oktapreview.com';
+    this.oauthService.issuer = 'https://dev-158606.oktapreview.com/oauth2/default';
 
     this.oauthService.loadDiscoveryDocument().then(() => {
       this.oauthService.tryLogin({});

@@ -69,7 +69,8 @@ export class HomeComponent {
   loginWithPassword() {
     this.oauthService.createAndSaveNonce().then(nonce => {
       const authClient = new OktaAuth({
-        url: this.oauthService.issuer
+        url: 'https://dev-158606.oktapreview.com',
+        issuer: 'default'
       });
       authClient.signIn({
         username: this.username,
