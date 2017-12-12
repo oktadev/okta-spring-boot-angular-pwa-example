@@ -91,11 +91,11 @@ You can use Chrome Developer Tools to toggle offline in the Network tab and prov
 
 ![Offline baby!](static/offline-works.png)
 
-## Deploy to the Cloud
+### Deploy to the Cloud
 
 See [deploy.sh](deploy.sh) to see how to deploy to Cloud Foundry. See [heroku.sh](heroku.sh) to see how to deploy to Heroku.
 
-## Lighthouse Score
+### Lighthouse Score
 
 You can see that this app scores 100 as a PWA using [Lighthouse](https://developers.google.com/web/tools/lighthouse/).
 
