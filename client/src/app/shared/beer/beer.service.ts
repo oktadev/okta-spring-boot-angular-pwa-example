@@ -14,7 +14,7 @@ export class BeerService {
     const headers: Headers = new Headers();
     headers.append('Authorization', this.oauthService.authorizationHeader());
 
-    const options = new RequestOptions({ headers: headers });
+    const options = new RequestOptions({ headers: headers, withCredentials: true });
 
     return this.http.get('http://localhost:8080/good-beers', options)
       .map((response: Response) => response.json());
