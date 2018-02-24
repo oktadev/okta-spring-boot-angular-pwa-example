@@ -1,18 +1,17 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
-import { FormsModule } from '@angular/forms';
-import { HttpModule } from '@angular/http';
-
+import { HttpClientModule } from '@angular/common/http';
 import { AppComponent } from './app.component';
 import { BeerListComponent } from './beer-list/beer-list.component';
-import { BeerService } from './shared/beer/beer.service';
-import { GiphyService } from './shared/giphy/giphy.service';
-import { MaterialModule } from '@angular/material';
-import { AppShellModule } from '@angular/app-shell';
+import { MatButtonModule, MatCardModule, MatInputModule, MatListModule, MatToolbarModule } from '@angular/material';
+import { ServiceWorkerModule } from '@angular/service-worker';
+import { environment } from '../environments/environment';
 import { OAuthModule } from 'angular-oauth2-oidc';
 import { HomeComponent } from './home/home.component';
 import { RouterModule, Routes } from '@angular/router';
 import { AuthGuard } from './shared/auth/auth.guard';
+import { FormsModule } from '@angular/forms';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 const appRoutes: Routes = [
   { path: 'beer-list', component: BeerListComponent, canActivate: [AuthGuard] },
@@ -20,7 +19,6 @@ const appRoutes: Routes = [
   { path: '', redirectTo: 'home', pathMatch: 'full' },
   { path: '**', redirectTo: 'home' }
 ];
-
 @NgModule({
   declarations: [
     AppComponent,
@@ -29,14 +27,16 @@ const appRoutes: Routes = [
   ],
   imports: [
     BrowserModule,
+    HttpClientModule,
     FormsModule,
-    HttpModule,
-    MaterialModule,
-    AppShellModule.runtime(),
+    BrowserAnimationsModule,
+    MatButtonModule, MatCardModule, MatInputModule, MatListModule, MatToolbarModule,
+    ServiceWorkerModule.register('/ngsw-worker.js', {enabled: environment.production}),
     OAuthModule.forRoot(),
     RouterModule.forRoot(appRoutes)
   ],
-  providers: [BeerService, GiphyService, AuthGuard],
+  providers: [AuthGuard],
   bootstrap: [AppComponent]
 })
-export class AppModule { }
+export class AppModule {
+}

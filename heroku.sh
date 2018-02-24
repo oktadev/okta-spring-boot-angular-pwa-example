@@ -39,21 +39,14 @@ cd $r/server
 mvn clean package -DskipTests
 
 heroku deploy:jar target/*jar -r server -o "--server.port=\$PORT"
-heroku config:set -r server \
-  FORCE_HTTPS="true" \
-  STORMPATH_CLIENT_BASEURL="$STORMPATH_CLIENT_BASEURL" \
-  STORMPATH_WEB_CORS_ALLOWED_ORIGINURIS="$clientUri" \
-  OKTA_APPLICATION_ID="$OKTA_APPLICATION_ID" \
-  OKTA_API_TOKEN="$OKTA_API_TOKEN"
+heroku config:set -r server FORCE_HTTPS="true"
 
 # Deploy the client
 cd $r/client
 rm -rf dist
 # replace the server URL in the client
 sed -i -e "s|http://localhost:8080|$serverUri|g" $r/client/src/app/shared/beer/beer.service.ts
-yarn && ng build --prod --aot
-# Fix filenames in sw.js
-python $r/sw.py
+npm install && ng build --prod
 cd dist
 
 cat << EOF > static.json
@@ -90,10 +83,19 @@ curl -s -L "$output_stream_url"
 rm build.json
 rm ../dist.tgz
 
+# replace the client URL in the server
+sed -i -e "s|http://localhost:4200|$clientUri|g" $r/server/src/main/java/com/example/demo/DemoApplication.java
+
+# redeploy the server
+cd $r/server
+mvn package -DskipTests
+heroku deploy:jar target/*jar -r server -o "--server.port=\$PORT"
+
 # cleanup changed files
-git checkout $r/client
-git checkout $r/server
+sed -i -e "s|$serverUri|http://localhost:8080|g" $r/client/src/app/shared/beer/beer.service.ts
+sed -i -e "s|$clientUri|http://localhost:4200|g" $r/server/src/main/java/com/example/demo/beer/BeerController.java
 rm $r/client/src/app/shared/beer/beer.service.ts-e
+rm $r/server/src/main/java/com/example/demo/beer/BeerController.java-e
 
 # show apps and URLs
 heroku open -r client

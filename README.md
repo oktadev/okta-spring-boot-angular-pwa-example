@@ -4,7 +4,7 @@ This is an example app that shows how to add Authentication with Okta to an Angu
 
 To see how this application was created, please read [Add Authentication to Your Angular PWA](https://developer.okta.com/blog/2017/06/13/add-authentication-angular-pwa) on the Okta Developer blog.
 
-You will need to have an [Okta Developer account](https://developer.okta.com/signup/) and environment variables configured to run this application.
+You will need to have an [Okta Developer account](https://developer.okta.com/signup/) and your Okta settings configured to run this application.
 
 > [Okta](https://developer.okta.com/) has Authentication and User Management APIs that reduce development time with instant-on, scalable user infrastructure. Okta's intuitive API and expert support make it easy for developers to authenticate, manage and secure users and roles in any application.
 
@@ -38,35 +38,40 @@ npm install && npm start
 
 ### Create Applications in Okta
 
-You will need to [create an application in Okta](https://developer.okta.com/blog/2017/06/13/add-authentication-angular-pwa#create-an-application) to configure the Spring Boot side of things.
+You will need to [create an application in Okta](https://developer.okta.com/blog/2017/06/13/add-authentication-angular-pwa#create-open-id-connect-app) to configure the Spring Boot both Angular and Spring Boot.
 
-After creating an app and an access token, you should be able to set the following environment variables:
+Log in to your Okta Developer account and navigate to **Applications** > **Add Application**. Click **Single-Page App**, click **Next**, and give the app a name you’ll remember (e.g., "Angular PWA"). Change all instances of `localhost:8080` to `localhost:4200` and click **Done**.
 
+**TIP:** Add `http://localhost:4200` as a **Logout redirect URI** so Logout functionality works in your Angular app.
+
+Copy the client ID into your `server/src/main/resources/application.properties` file. While you're in there, add a `okta.oauth2.issuer` property that matches your Okta domain. For example:
+
+```properties
+okta.oauth2.issuer=https://{yourOktaDomain}.com/oauth2/default
+okta.oauth2.clientId={clientId}
 ```
-export STORMPATH_CLIENT_BASEURL=[baseurl_from_above]
-export OKTA_APPLICATION_ID=[application_id_from_above]
-export OKTA_API_TOKEN=[api_token_from_above]
-```
 
-After you set these environment variables, make sure to restart Spring Boot with `./mvn spring-boot:run`.
-
-For Angular, you'll need to [create an OIDC app on Okta](https://developer.okta.com/blog/2017/06/13/add-authentication-angular-pwa#create-an-openid-connect-app-for-angular). Change `{clientId}` and `{yourOktaDomain}` in `src/app/app.component.ts` to match your app's values.
-
+Replace the placeholders in `client/src/app/app.component.ts` to configure your Okta application settings (replacing `{clientId}` and `{yourOktaDomain}` with the values from your "Angular PWA" OIDC app).
+                            
 ```typescript
-constructor(private oauthService: OAuthService) {
-  this.oauthService.redirectUri = window.location.origin;
-  this.oauthService.clientId = '{clientId}';
-  this.oauthService.scope = 'openid profile email';
-  this.oauthService.oidc = true;
-  this.oauthService.issuer = 'https://{yourOktaDomain}.com/oauth2/default';
+import { JwksValidationHandler, OAuthService } from 'angular-oauth2-oidc';
 
-  this.oauthService.loadDiscoveryDocument().then(() => {
-    this.oauthService.tryLogin({});
-  });
-}
+...
+
+  constructor(private oauthService: OAuthService) {
+    this.oauthService.redirectUri = window.location.origin;
+    this.oauthService.clientId = '{clientId}';
+    this.oauthService.scope = 'openid profile email';
+    this.oauthService.oidc = true;
+    this.oauthService.issuer = 'https://{yourOktaDomain}.com/oauth2/default';
+    this.oauthService.tokenValidationHandler = new JwksValidationHandler();
+
+    this.oauthService.loadDiscoveryDocumentAndTryLogin();
+  }
+...
 ```
 
-You'll also need to specify the `url` in `src/home/home.component.ts`.
+You'll also need to specify the `url` in `client/src/home/home.component.ts`.
 
 ```typescript
 const authClient = new OktaAuth({
@@ -82,10 +87,6 @@ After making these changes, you should be able to log in with your credentials a
 You will be prompted to log in when you first load the client.
 
 ![Angular Login Form](static/angular-login-form.png)
-
-On the `stormpath` branch, you can see how to use the [Stormpath Angular SDK](https://github.com/stormpath/stormpath-sdk-angular).
-
-![Angular Login Form](static/angular-sp-login.png)
 
 You can use Chrome Developer Tools to toggle offline in the Network tab and prove that it works offline.
 
@@ -107,6 +108,7 @@ Cloud Foundry                                                  |  Heroku
 
 This example uses the following libraries provided by Okta:
 
+* [Okta Spring Boot Starter](https://github.com/okta/okta-spring-boot)
 * [Okta Auth SDK](https://github.com/okta/okta-auth-js)
 
 It also uses the following library provided by [Manfred Steyer](https://github.com/manfredsteyer):
