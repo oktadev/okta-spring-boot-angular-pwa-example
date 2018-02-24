@@ -1,23 +1,22 @@
-import { Component } from '@angular/core';
+import { ChangeDetectorRef, Component } from '@angular/core';
 import { OAuthService } from 'angular-oauth2-oidc';
-import { Router } from '@angular/router';
-declare const OktaAuth: any;
+import * as OktaAuth from '@okta/okta-auth-js';
 
 @Component({
   template: `
-    <md-card *ngIf="givenName">
+    <mat-card *ngIf="givenName">
       <h2>Welcome, {{givenName}}!</h2>
-      <button md-raised-button (click)="logout()">Logout</button>
-      <a md-button routerLink="/beer-list">Beer List</a>
-    </md-card>
+      <button mat-raised-button (click)="logout()">Logout</button>
+      <a mat-button routerLink="/beer-list">Beer List</a>
+    </mat-card>
 
-    <md-card *ngIf="!givenName">
-      <md-card-title>Login with Redirect</md-card-title>
-      <button md-raised-button (click)="login()">Login</button>
-    </md-card>
+    <mat-card *ngIf="!givenName">
+      <mat-card-title>Login with Redirect</mat-card-title>
+      <button mat-raised-button (click)="login()">Login</button>
+    </mat-card>
 
-    <md-card *ngIf="!givenName">
-      <md-card-title>Login Directly</md-card-title>
+    <mat-card *ngIf="!givenName">
+      <mat-card-title>Login Directly</mat-card-title>
 
       <form (ngSubmit)="loginWithPassword()" ngNativeValidate>
         <p style="color:red; font-weight:bold" *ngIf="error">
@@ -25,29 +24,29 @@ declare const OktaAuth: any;
         </p>
 
         <p>
-          <md-input-container>
-            <input mdInput [(ngModel)]="username" name="username"
+          <mat-form-field>
+            <input matInput [(ngModel)]="username" name="username"
                    placeholder="Name" required>
-          </md-input-container>
+          </mat-form-field>
         </p>
 
         <p>
-          <md-input-container>
-            <input mdInput [(ngModel)]="password" name="password"
+          <mat-form-field>
+            <input matInput [(ngModel)]="password" name="password"
                    type="password" placeholder="Password" required>
-          </md-input-container>
+          </mat-form-field>
         </p>
 
-        <button md-raised-button type="submit">Login</button>
+        <button mat-raised-button type="submit">Login</button>
       </form>
-    </md-card>`
+    </mat-card>`
 })
 export class HomeComponent {
   private username: string;
   private password: string;
   private error: string;
 
-  constructor(private oauthService: OAuthService, private router: Router) {
+  constructor(private oauthService: OAuthService, private changeDetector: ChangeDetectorRef) {
   }
 
   login() {
@@ -59,7 +58,7 @@ export class HomeComponent {
   }
 
   get givenName() {
-    const claims = this.oauthService.getIdentityClaims();
+    const claims: any = this.oauthService.getIdentityClaims();
     if (!claims) {
       return null;
     }
@@ -72,12 +71,12 @@ export class HomeComponent {
         url: 'https://dev-158606.oktapreview.com',
         issuer: 'default'
       });
-      authClient.signIn({
+      return authClient.signIn({
         username: this.username,
         password: this.password
       }).then((response) => {
         if (response.status === 'SUCCESS') {
-          authClient.token.getWithoutPrompt({
+          return authClient.token.getWithoutPrompt({
             clientId: this.oauthService.clientId,
             responseType: ['id_token', 'token'],
             scopes: ['openid', 'profile', 'email'],
@@ -86,11 +85,16 @@ export class HomeComponent {
             redirectUri: window.location.origin
           })
             .then((tokens) => {
-              // oauthService.processIdToken doesn't set an access token
-              // set it manually so oauthService.authorizationHeader() works
-              localStorage.setItem('access_token', tokens[1].accessToken);
-              this.oauthService.processIdToken(tokens[0].idToken, tokens[1].accessToken);
-              this.router.navigate(['/home']);
+              const idToken = tokens[0].idToken;
+              const accessToken = tokens[1].accessToken;
+              const keyValuePair = `#id_token=${encodeURIComponent(idToken)}&access_token=${encodeURIComponent(accessToken)}`;
+              this.oauthService.tryLogin({
+                customHashFragment: keyValuePair,
+                disableOAuth2StateCheck: true
+              }).then(() => {
+                // notify Angular that things have changed
+                this.changeDetector.detectChanges();
+              });
             });
         } else {
           throw new Error('We cannot handle the ' + response.status + ' status');

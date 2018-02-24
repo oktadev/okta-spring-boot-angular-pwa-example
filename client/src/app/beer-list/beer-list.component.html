@@ -1,15 +1,15 @@
-<a md-button routerLink="/home">Home</a>
+<a mat-button routerLink="/home">Home</a>
 
-<md-card>
-  <md-card-title>Beer List</md-card-title>
-  <md-card-content>
-    <md-list>
-      <md-list-item *ngFor="let beer of beers">
-        <img md-list-avatar src="{{beer.giphyUrl}}" alt="{{beer.name}}">
-        <h3 md-line>
+<mat-card>
+  <mat-card-title>Beer List</mat-card-title>
+  <mat-card-content>
+    <mat-list>
+      <mat-list-item *ngFor="let beer of beers">
+        <img mat-list-avatar src="{{beer.giphyUrl}}" alt="{{beer.name}}">
+        <h3 mat-line>
           {{beer.name}}
         </h3>
-      </md-list-item>
-    </md-list>
-  </md-card-content>
-</md-card>
+      </mat-list-item>
+    </mat-list>
+  </mat-card-content>
+</mat-card>

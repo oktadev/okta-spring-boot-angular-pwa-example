@@ -40,11 +40,7 @@ cf a
 # Deploy the server
 cd $r/server
 mvn clean package
-cf push -p target/*jar pwa-server --no-start  --random-route
-cf set-env pwa-server FORCE_HTTPS true
-cf set-env pwa-server STORMPATH_CLIENT_BASEURL $STORMPATH_CLIENT_BASEURL
-cf set-env pwa-server OKTA_APPLICATION_ID $OKTA_APPLICATION_ID
-cf set-env pwa-server OKTA_API_TOKEN $OKTA_API_TOKEN
+cf push -p target/*jar pwa-server --no-start --random-route
 
 # Get the URL for the server
 serverUri=https://`app_domain pwa-server`
@@ -54,12 +50,10 @@ cd $r/client
 rm -rf dist
 # replace the server URL in the client
 sed -i -e "s|http://localhost:8080|$serverUri|g" $r/client/src/app/shared/beer/beer.service.ts
-yarn && ng build --prod --aot
-# Fix filenames in sw.js
-python $r/sw.py
+npm install && ng build --prod
 cd dist
 touch Staticfile
-echo 'pushstate: enabled' > Staticfile
+echo "pushstate: enabled" >> Staticfile
 cf push pwa-client --no-start --random-route
 cf set-env pwa-client FORCE_HTTPS true
 cf start pwa-client
@@ -68,7 +62,7 @@ cf start pwa-client
 clientUri=https://`app_domain pwa-client`
 
 # replace the client URL in the server
-sed -i -e "s|http://localhost:4200|$clientUri|g" $r/server/src/main/resources/application.properties
+sed -i -e "s|http://localhost:4200|$clientUri|g" $r/server/src/main/java/com/example/demo/DemoApplication.java
 
 # redeploy the server
 cd $r/server
@@ -76,10 +70,11 @@ mvn package -DskipTests
 cf push -p target/*jar pwa-server
 
 # cleanup changed files
-git checkout $r/client
-git checkout $r/server
+# Put the original server URL back in the client
+sed -i -e "s|$serverUri|http://localhost:8080|g" $r/client/src/app/shared/beer/beer.service.ts
+sed -i -e "s|$clientUri|http://localhost:4200|g" $r/server/src/main/java/com/example/demo/DemoApplication.java
 rm $r/client/src/app/shared/beer/beer.service.ts-e
-rm $r/server/src/main/resources/application.properties-e
+rm $r/server/src/main/java/com/example/demo/DemoApplication.java-e
 
 # show apps and URLs
 cf apps

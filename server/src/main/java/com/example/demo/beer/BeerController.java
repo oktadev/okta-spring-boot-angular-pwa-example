@@ -1,4 +1,4 @@
-package com.example.beer;
+package com.example.demo.beer;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
