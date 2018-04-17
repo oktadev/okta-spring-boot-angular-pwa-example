@@ -18,7 +18,7 @@ You will need to have an [Okta Developer account](https://developer.okta.com/sig
 To install this example application, run the following commands:
 
 ```bash
-git clone git@github.com:oktadeveloper/okta-spring-boot-angular-pwa-example.git
+git clone https://github.com/oktadeveloper/okta-spring-boot-angular-pwa-example.git
 cd okta-spring-boot-angular-pwa-example
 ```
 
